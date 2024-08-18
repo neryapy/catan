@@ -1,3 +1,4 @@
+
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -13,21 +14,22 @@ import java.awt.geom.AffineTransform;
 public class Board extends JPanel implements MouseListener {
     private List<HexagonResource> hexagons;
     private List<Road> roads;
-    private static Map<Integer, Set<Integer>> villages;
+    static ArrayList<Village> villages = new ArrayList<Village>();
     private static Map<Integer, Set<Integer>> cities;
     private final int hexSize = 30;
     private final double verticalSpacing;
     private final double horizontalSpacing;
     private BufferedImage portOreImage;
     private int indexGener = 0;
-    private int mode = 3; // Default mode
+    public static int mode; // Default mode
+    public static int ownerAbstarct;
     private static int offsetX;
     private static int offsetY;
-
+    public int i=0;
+    int[][] roadCoordinates = {{0, 17, 22, 78, 82, 0, 1, 2}, {0, -5, -3, 72, 76, 0, 2, 3}, {0, -27, -22, 83, 88, 0, 3, 4}, {0, 17, 21, 103, 108, 0, 0, 1}, {0, -10, -5, 119, 126, 0, 6, 5}, {0, -26, -22, 105, 110, 0, 4, 5}, {1, -27, -20, 134, 140, 1, 3, 4}, {1, 17, 22, 131, 136, 1, 2, 1}, {1, 18, 23, 152, 158, 1, 0, 1}, {1, -28, -23, 154, 160, 1, 4, 5}, {1, -6, 1, 169, 175, 1, 0, 5}, {3, 76, 82, 64, 72, 3, 0, 1}, {3, 62, 70, 38, 46, 3, 0, 2}, {3, 31, 38, 38, 46, 3, 0, 3}, {2, -26, -20, 182, 190, 2, 3, 4}, {2, -26, -20, 205, 212, 2, 4, 5}, {2, -8, 2, 222, 228, 2, 5, 6}, {2, 17, 25, 178, 185, 2, 2, 1}, {2, 17, 25, 204, 212, 2, 6, 1}, {3, 17, 25, 55, 62, 3, 3, 4}, {3, 38, 44, 92, 97, 3, 5, 0}, {3, 38, 44, 42, 47, 3, 3, 2}, {3, 60, 64, 55, 60, 3, 1, 2}, {3, 62, 67, 82, 87, 3, 1, 0}, {4, 38, 44, 142, 147, 4, 5, 6}, {4, 62, 67, 132, 137, 4, 1, 0}, {4, 62, 67, 105, 110, 4, 2, 1}, {5, 62, 67, 157, 163, 5, 1, 2}, {5, 38, 44, 188, 196, 5, 5, 0}, {5, 64, 70, 178, 184, 5, 0, 1}, {6, 18, 25, 228, 235, 6, 4, 5}, {6, 38, 45, 243, 248, 6, 0, 5}, {6, 61, 67, 206, 211, 6, 1, 2}, {6, 61, 67, 229, 235, 6, 0, 1}, {7, 86, 91, 67, 75, 7, 5, 0}, {7, 64, 69, 30, 38, 7, 3, 4}, {7, 106, 114, 16, 24, 7, 2, 3}, {7, 76, 84, 16, 24, 7, 0, 3}, {7, 108, 113, 55, 60, 7, 0, 1}, {7, 82, 90, 72, 78, 7, 0, 5}, {7, 105, 111, 28, 36, 7, 1, 2}, {7, 84, 90, 21, 26, 7, 2, 3}, {8, 84, 90, 120, 126, 8, 0, 5}, {8, 107, 113, 82, 88, 8, 1, 2}, {8, 107, 113, 107, 113, 8, 0, 1}, {9, 85, 90, 168, 175, 9, 5, 0}, {9, 106, 111, 128, 133, 9, 1, 2}, {9, 106, 111, 155, 160, 9, 0, 1}, {10, 80, 86, 216, 224, 10, 5, 0}, {10, 108, 113, 204, 210, 10, 0, 1}, {10, 108, 113, 180, 186, 10, 1, 2}, {11, 60, 66, 253, 261, 11, 4, 5}, {11, 81, 87, 265, 273, 11, 5, 0}, {11, 108, 114, 255, 260, 11, 0, 1}, {11, 107, 112, 230, 236, 11, 1, 2}, {12, 126, 132, 93, 99, 12, 5, 0}, {12, 153, 159, 80, 86, 12, 0, 1}, {12, 150, 156, 53, 58, 12, 1, 2}, {12, 131, 137, 41, 47, 12, 2, 3}, {13, 125, 131, 141, 147, 13, 0, 5}, {13, 154, 160, 130, 136, 13, 0, 1}, {13, 149, 155, 107, 113, 13, 1, 2}, {14, 128, 134, 193, 200, 14, 0, 5}, {14, 149, 155, 180, 186, 14, 0, 1}, {14, 149, 155, 156, 161, 14, 1, 2}, {15, 129, 135, 242, 248, 15, 0, 5}, {15, 149, 155, 231, 237, 15, 0, 1}, {15, 149, 155, 204, 210, 15, 1, 2}, {15, 173, 179, 192, 198, 15, 2, 3},};
     public Board() {
         hexagons = new ArrayList<>();
         roads = new ArrayList<>();
-        villages = new HashMap<>();
         cities = new HashMap<>();
         verticalSpacing = Math.sqrt(3) * hexSize;
         horizontalSpacing = 1.5 * hexSize;
@@ -81,7 +83,6 @@ public class Board extends JPanel implements MouseListener {
         printSortedHexagons();
         addMouseListener(this);
     }
-
     private String getNextResourceType(List<String> resources) {
         return resources.isEmpty() ? "Unknown" : resources.remove(0);
     }
@@ -179,17 +180,18 @@ public class Board extends JPanel implements MouseListener {
         for (Road road : roads) {
             road.draw(g2d, hexagons);
         }
+        if (villages.size() != 0) {
+            for (int i = 0; i < villages.size(); i++) {  // Fix loop condition to iterate correctly
+                int index = villages.get(i).getIndex();
+                int vertex = villages.get(i).getVertex();
+                int owner = villages.get(i).getOwner();
 
-        // Draw the villages
-        for (Map.Entry<Integer, Set<Integer>> entry : villages.entrySet()) {
-            int index = entry.getKey();
-            Set<Integer> vertices = entry.getValue();
-            for (int vertex : vertices) {
-                new Village(index, vertex).draw(g2d, hexagons);
+                // Now draw the village using the existing object in the list
+                villages.get(i).draw(g2d, hexagons);
             }
         }
     }
-
+    private static final int[][] VILLAGE_City_COORDINATES = {{0, 1, 23, 31, 92, 100}, {0, 2, 7, 15, 66, 72}, {0, 3, -22, -14, 66, 72}, {0, 4, -37, -29, 92, 100}, {1, 1, 23, 31, 141, 147}, {1, 3, -22, -14, 116, 126}, {1, 4, -37, -29, 141, 147}, {2, 0, 7, 15, 216, 222}, {2, 1, 23, 31, 191, 197}, {2, 3, -22, -14, 161, 169}, {2, 4, -37, -29, 191, 197}, {2, 5, -22, -14, 216, 222}, {3, 0, 50, 58, 89, 97}, {3, 1, 23, 31, 160, 170}, {3, 1, 66, 72, 64, 72}, {3, 2, 52, 60, 38, 46}, {3, 3, 21, 28, 38, 46}, {4, 0, 52, 60, 139, 149}, {4, 1, 67, 75, 114, 122}, {4, 4, 7, 15, 117, 123}, {5, 0, 52, 60, 188, 196}, {5, 1, 67, 75, 163, 171}, {5, 4, 7, 15, 160, 173}, {6, 0, 52, 60, 238, 246}, {6, 1, 67, 75, 213, 221}, {6, 5, 21, 29, 238, 246}, {7, 0, 96, 104, 67, 75}, {7, 1, 111, 119, 42, 50}, {7, 2, 96, 104, 16, 24}, {7, 3, 66, 74, 16, 24}, {8, 0, 96, 104, 117, 125}, {8, 1, 113, 121, 94, 101}, {9, 0, 96, 104, 166, 172}, {9, 1, 111, 119, 141, 149}, {10, 0, 96, 104, 216, 224}, {10, 1, 111, 119, 191, 199}, {11, 0, 96, 104, 265, 273}, {11, 1, 111, 119, 240, 248}, {11, 5, 65, 73, 265, 273}, {12, 0, 140, 148, 89, 97}, {12, 1, 155, 163, 64, 72}, {12, 2, 140, 148, 38, 46}, {13, 0, 140, 148, 139, 147}, {13, 1, 155, 163, 114, 122}, {14, 0, 140, 148, 188, 196}, {14, 1, 155, 163, 168, 176}, {15, 0, 140, 148, 238, 246}, {15, 1, 155, 163, 218, 226}, {16, 0, 184, 192, 117, 125}, {16, 1, 199, 207, 92, 98}, {16, 2, 184, 192, 66, 74}, {17, 0, 184, 192, 166, 174}, {17, 1, 199, 207, 141, 149}, {18, 0, 184, 192, 216, 224}, {18, 1, 199, 207, 191, 199}};
     private void drawPorts(Graphics2D g2d, int offsetX, int offsetY) {
         g2d.setColor(new Color(227, 118, 25));
         g2d.drawString("2:1 brick", offsetX + 65, offsetY - 55);
@@ -227,505 +229,60 @@ public class Board extends JPanel implements MouseListener {
         drawPort(g2d, offsetX + 28, offsetY + 30, "C:/prog/workspace java/catan/src/everything_port.png");
         g2d.drawString("3:1 everything", offsetX - 50, offsetY + 45);
     }
-    @Override
     public void mouseClicked(MouseEvent e) {
-        int x = e.getX();
-        int y = e.getY();
-        int panelWidth = getWidth();
-        int panelHeight = getHeight();
-        int maxRowSize = 7;
-        int boardWidth = (int) (horizontalSpacing * (maxRowSize - 1) + hexSize * 2);
-        int boardHeight = (int) (verticalSpacing * (maxRowSize - 1) + hexSize * 2);
-        int offsetX = (panelWidth - boardWidth) / 2;
-        int offsetY = (panelHeight - boardHeight) / 2;
-
-        int relativeX = x - offsetX;
-        int relativeY = y - offsetY;
-
-        // Debug prints
-        System.out.println("Clicked at absolute coordinates: (" + x + ", " + y + ")");
+        int relativeX = e.getX() - ((getWidth() - (int) (horizontalSpacing * 6 + hexSize * 2)) / 2);
+        int relativeY = e.getY() - ((getHeight() - (int) (verticalSpacing * 6 + hexSize * 2)) / 2);
         System.out.println("Clicked at relative coordinates: (" + relativeX + ", " + relativeY + ")");
-        if(mode==1){
-            if(23<=relativeY && relativeY<=31&&relativeX<=100&&relativeX>=92){addVillage(0,1);
-            System.out.println(villages);}
-            if(7<=relativeY && relativeY<=15&&relativeX<=72&&relativeX>=66){addVillage(0,2);}
-            if(-22<=relativeY && relativeY<=-14&&relativeX<=72&&relativeX>=66){addVillage(0,3);}
-            if(-37<=relativeY && relativeY<=-29&&relativeX<=100&&relativeX>=92){addVillage(0,4);}
-
-            if(23<=relativeY && relativeY<=31&&relativeX<=147&&relativeX>=141){addVillage(1,1);}
-            if(-22<=relativeY && relativeY<=-14&&relativeX<=126&&relativeX>=116){addVillage(1,3);}
-            if(-37<=relativeY && relativeY<=-29&&relativeX<=147&&relativeX>=141){addVillage(1,4);}
-
-            if(7<=relativeY && relativeY<=15&&relativeX<=222&&relativeX>=216){addVillage(2,0);}
-            if(23<=relativeY && relativeY<=31&&relativeX<=197&&relativeX>=191){addVillage(2,1);}
-            if(-22<=relativeY && relativeY<=-14&&relativeX<=169&&relativeX>=161){addVillage(2,3);}
-            if(-37<=relativeY && relativeY<=-29&&relativeX<=197&&relativeX>=191){addVillage(2,4);}
-            if(-22<=relativeY && relativeY<=-14&&relativeX<=222&&relativeX>=216){addVillage(2,5);}
-
-            if(50<=relativeY && relativeY<=58&&relativeX<=97&&relativeX>=89){addVillage(3,0);}
-            if(23<=relativeY && relativeY<=31&&relativeX<=170&&relativeX>=160){addVillage(3,1);}
-            if(66<=relativeY && relativeY<=72&&relativeX<=72&&relativeX>64){addVillage(3,1);}
-            if(52<=relativeY && relativeY<=60&&relativeX<=46&&relativeX>=38){addVillage(3,2);}
-            if(21<=relativeY && relativeY<=28&&relativeX<=46&&relativeX>=38){addVillage(3,3);}
-
-            if(52<=relativeY && relativeY<=60&&relativeX<=149&&relativeX>=139){addVillage(4,0);}
-            if(67<=relativeY && relativeY<=75&&relativeX<=122&&relativeX>=114){addVillage(4,1);}
-            if(7<=relativeY && relativeY<=15&&relativeX<=123&&relativeX>=117){addVillage(4,4);}
-
-            if(52<=relativeY && relativeY<=60&&relativeX<=196&&relativeX>=188){addVillage(5,0);}
-            if(67<=relativeY && relativeY<=75&&relativeX<=171&&relativeX>=163){addVillage(5,1);}
-            if(7<=relativeY && relativeY<=15&&relativeX<=173&&relativeX>=160){addVillage(5,4);}
-
-            if(52<=relativeY && relativeY<=60&&relativeX<=246&&relativeX>=238){addVillage(6,0);}
-            if(67<=relativeY && relativeY<=75&&relativeX<=221&&relativeX>=213){addVillage(6,1);}
-            if(21<=relativeY && relativeY<=29&&relativeX<=246&&relativeX>=238){addVillage(6,5);}
-
-            if(96<=relativeY && relativeY<=104&&relativeX<=75&&relativeX>=67){addVillage(7,0);}
-            if(111<=relativeY && relativeY<=119&&relativeX<=50&&relativeX>=42){addVillage(7,1);}
-            if(96<=relativeY && relativeY<=104&&relativeX<=24&&relativeX>=16){addVillage(7,2);}
-            if(66<=relativeY && relativeY<=74&&relativeX<=24&&relativeX>=16){addVillage(7,3);}
-
-            if(96<=relativeY && relativeY<=104&&relativeX<=125&&relativeX>=117){addVillage(8,0);}
-            if(113<=relativeY && relativeY<=121&&relativeX<=101&&relativeX>=94){addVillage(8,1);}
-
-            if(96<=relativeY && relativeY<=104&&relativeX<=172&&relativeX>=166){addVillage(9,0);}
-            if(111<=relativeY && relativeY<=119&&relativeX<=149&&relativeX>=141){addVillage(9,1);}
-
-            if(96<=relativeY && relativeY<=104&&relativeX<=224&&relativeX>=216){addVillage(10,0);}
-            if(111<=relativeY && relativeY<=119&&relativeX<=199&&relativeX>=191){addVillage(10,1);}
-
-            if(96<=relativeY && relativeY<=104&&relativeX<=273&&relativeX>=265){addVillage(11,0);}
-            if(111<=relativeY && relativeY<=119&&relativeX<=248&&relativeX>=240){addVillage(11,1);}
-            if(65<=relativeY && relativeY<=73&&relativeX<=273&&relativeX>=265){addVillage(11,5);}
-
-            if(140<=relativeY && relativeY<=148&&relativeX<=97&&relativeX>=89){addVillage(12,0);}
-            if(155<=relativeY && relativeY<=163&&relativeX<=72&&relativeX>=64){addVillage(12,1);}
-            if(140<=relativeY && relativeY<=148&&relativeX<=46&&relativeX>=38){addVillage(12,2);}
-
-            if(140<=relativeY && relativeY<=148&&relativeX<=147&&relativeX>=139){addVillage(13,0);}
-            if(155<=relativeY && relativeY<=163&&relativeX<=122&&relativeX>=114){addVillage(13,1);}
-
-            if(140<=relativeY && relativeY<=148&&relativeX<=196&&relativeX>=188){addVillage(14,0);}
-            if(155<=relativeY && relativeY<=163&&relativeX<=176&&relativeX>=168){addVillage(14,1);}
-
-            if(140<=relativeY && relativeY<=148&&relativeX<=246&&relativeX>=238){addVillage(15,0);}
-            if(155<=relativeY && relativeY<=163&&relativeX<=226&&relativeX>=218){addVillage(15,1);}
-
-            if(184<=relativeY && relativeY<=192&&relativeX<=125&&relativeX>=117){addVillage(16,0);}
-            if(199<=relativeY && relativeY<=207&&relativeX<=98&&relativeX>=92){addVillage(16,1);}
-            if(184<=relativeY && relativeY<=192&&relativeX<=74&&relativeX>=66){addVillage(16,2);}
-
-            if(184<=relativeY && relativeY<=192&&relativeX<=174&&relativeX>=166){addVillage(17,0);}
-            if(199<=relativeY && relativeY<=207&&relativeX<=149&&relativeX>=141){addVillage(17,1);}
-
-            if(184<=relativeY && relativeY<=192&&relativeX<=224&&relativeX>=216){addVillage(18,0);}
-            if(199<=relativeY && relativeY<=207&&relativeX<=199&&relativeX>=191){addVillage(18,1);}
-
-        }
-        if (mode==2){
-            if(23<=relativeY && relativeY<=31&&relativeX<=100&&relativeX>=92){addCity(0,1);}
-            if(7<=relativeY && relativeY<=15&&relativeX<=72&&relativeX>=66){addCity(0,2);}
-            if(-22<=relativeY && relativeY<=-14&&relativeX<=72&&relativeX>=66){addCity(0,3);}
-            if(-37<=relativeY && relativeY<=-29&&relativeX<=100&&relativeX>=92){addCity(0,4);}
-
-            if(23<=relativeY && relativeY<=31&&relativeX<=147&&relativeX>=141){addCity(1,1);}
-            if(-22<=relativeY && relativeY<=-14&&relativeX<=126&&relativeX>=116){addCity(1,3);}
-            if(-37<=relativeY && relativeY<=-29&&relativeX<=147&&relativeX>=141){addCity(1,4);}
-
-            if(7<=relativeY && relativeY<=15&&relativeX<=222&&relativeX>=216){addCity(2,0);}
-            if(23<=relativeY && relativeY<=31&&relativeX<=197&&relativeX>=191){addCity(2,1);}
-            if(-22<=relativeY && relativeY<=-14&&relativeX<=169&&relativeX>=161){addCity(2,3);}
-            if(-37<=relativeY && relativeY<=-29&&relativeX<=197&&relativeX>=191){addCity(2,4);}
-            if(-22<=relativeY && relativeY<=-14&&relativeX<=222&&relativeX>=216){addCity(2,5);}
-
-            if(50<=relativeY && relativeY<=58&&relativeX<=97&&relativeX>=89){addCity(3,0);}
-            if(23<=relativeY && relativeY<=31&&relativeX<=170&&relativeX>=160){addCity(3,1);}
-            if(66<=relativeY && relativeY<=72&&relativeX<=72&&relativeX>64){addCity(3,1);}
-            if(52<=relativeY && relativeY<=60&&relativeX<=46&&relativeX>=38){addCity(3,2);}
-            if(21<=relativeY && relativeY<=28&&relativeX<=46&&relativeX>=38){addCity(3,3);}
-
-            if(52<=relativeY && relativeY<=60&&relativeX<=149&&relativeX>=139){addCity(4,0);}
-            if(67<=relativeY && relativeY<=75&&relativeX<=122&&relativeX>=114){addCity(4,1);}
-            if(7<=relativeY && relativeY<=15&&relativeX<=123&&relativeX>=117){addCity(4,4);}
-
-            if(52<=relativeY && relativeY<=60&&relativeX<=196&&relativeX>=188){addCity(5,0);}
-            if(67<=relativeY && relativeY<=75&&relativeX<=171&&relativeX>=163){addCity(5,1);}
-            if(7<=relativeY && relativeY<=15&&relativeX<=173&&relativeX>=160){addCity(5,4);}
-
-            if(52<=relativeY && relativeY<=60&&relativeX<=246&&relativeX>=238){addCity(6,0);}
-            if(67<=relativeY && relativeY<=75&&relativeX<=221&&relativeX>=213){addCity(6,1);}
-            if(21<=relativeY && relativeY<=29&&relativeX<=246&&relativeX>=238){addCity(6,5);}
-
-            if(96<=relativeY && relativeY<=104&&relativeX<=75&&relativeX>=67){addCity(7,0);}
-            if(111<=relativeY && relativeY<=119&&relativeX<=50&&relativeX>=42){addCity(7,1);}
-            if(96<=relativeY && relativeY<=104&&relativeX<=24&&relativeX>=16){addCity(7,2);}
-            if(66<=relativeY && relativeY<=74&&relativeX<=24&&relativeX>=16){addCity(7,3);}
-
-            if(96<=relativeY && relativeY<=104&&relativeX<=125&&relativeX>=117){addCity(8,0);}
-            if(113<=relativeY && relativeY<=121&&relativeX<=101&&relativeX>=94){addCity(8,1);}
-
-            if(96<=relativeY && relativeY<=104&&relativeX<=172&&relativeX>=166){addCity(9,0);}
-            if(111<=relativeY && relativeY<=119&&relativeX<=149&&relativeX>=141){addCity(9,1);}
-
-            if(96<=relativeY && relativeY<=104&&relativeX<=224&&relativeX>=216){addCity(10,0);}
-            if(111<=relativeY && relativeY<=119&&relativeX<=199&&relativeX>=191){addCity(10,1);}
-
-            if(96<=relativeY && relativeY<=104&&relativeX<=273&&relativeX>=265){addCity(11,0);}
-            if(111<=relativeY && relativeY<=119&&relativeX<=248&&relativeX>=240){addCity(11,1);}
-            if(65<=relativeY && relativeY<=73&&relativeX<=273&&relativeX>=265){addCity(11,5);}
-
-            if(140<=relativeY && relativeY<=148&&relativeX<=97&&relativeX>=89){addCity(12,0);}
-            if(155<=relativeY && relativeY<=163&&relativeX<=72&&relativeX>=64){addCity(12,1);}
-            if(140<=relativeY && relativeY<=148&&relativeX<=46&&relativeX>=38){addCity(12,2);}
-
-            if(140<=relativeY && relativeY<=148&&relativeX<=147&&relativeX>=139){addCity(13,0);}
-            if(155<=relativeY && relativeY<=163&&relativeX<=122&&relativeX>=114){addCity(13,1);}
-
-            if(140<=relativeY && relativeY<=148&&relativeX<=196&&relativeX>=188){addCity(14,0);}
-            if(155<=relativeY && relativeY<=163&&relativeX<=176&&relativeX>=168){addCity(14,1);}
-
-            if(140<=relativeY && relativeY<=148&&relativeX<=246&&relativeX>=238){addCity(15,0);}
-            if(155<=relativeY && relativeY<=163&&relativeX<=226&&relativeX>=218){addCity(15,1);}
-
-            if(184<=relativeY && relativeY<=192&&relativeX<=125&&relativeX>=117){addCity(16,0);}
-            if(199<=relativeY && relativeY<=207&&relativeX<=98&&relativeX>=92){addCity(16,1);}
-            if(184<=relativeY && relativeY<=192&&relativeX<=74&&relativeX>=66){addCity(16,2);}
-
-            if(184<=relativeY && relativeY<=192&&relativeX<=174&&relativeX>=166){addCity(17,0);}
-            if(199<=relativeY && relativeY<=207&&relativeX<=149&&relativeX>=141){addCity(17,1);}
-
-            if(184<=relativeY && relativeY<=192&&relativeX<=224&&relativeX>=216){addCity(18,0);}
-            if(199<=relativeY && relativeY<=207&&relativeX<=199&&relativeX>=191){addCity(18,1);}
-
-        }
-        if (mode == 3) {
-            if (17 <= relativeY && relativeY <= 22 && relativeX >= 78 && relativeX <= 82) {
-                addRoad(new Road(0, 1, 2));
-                System.out.println("Road added: 0, 1, 2");
-            }
-            if (-5 <= relativeY && relativeY <= -3 && relativeX >= 72 && relativeX <= 76) {
-                addRoad(new Road(0, 2, 3));
-                System.out.println("Road added: 0, 2, 3");
-            }
-            if (-27 <= relativeY && relativeY <= -22 && relativeX >= 83 && relativeX <= 88) {
-                addRoad(new Road(0, 3, 4));
-                System.out.println("Road added: 0, 3, 4");
-            }
-            if (17 <= relativeY && relativeY <= 21 && relativeX >= 103 && relativeX <= 108) {
-                addRoad(new Road(0, 0, 1));
-                System.out.println("Road added: 0, 0, 1");
-            }
-            if (-10 <= relativeY && relativeY <= -5 && relativeX >= 119 && relativeX <= 126) {
-                addRoad(new Road(0, 6, 5));
-                System.out.println("Road added: 0, 6, 5");
-            }
-            if (-26 <= relativeY && relativeY <= -22 && relativeX >= 105 && relativeX <= 110) {
-                addRoad(new Road(0, 4, 5));
-                System.out.println("Road added: 0, 4, 5");
-            }
-            if (-27 <= relativeY && relativeY <= -20 && relativeX >= 134 && relativeX <= 140) {
-                addRoad(new Road(1, 3, 4));
-                System.out.println("Road added: 1, 3, 4");
-            }
-            if (17 <= relativeY && relativeY <= 22 && relativeX >= 131 && relativeX <= 136) {
-                addRoad(new Road(1, 2, 1));
-                System.out.println("Road added: 1, 2, 1");
-            }
-            if (18 <= relativeY && relativeY <= 23 && relativeX >= 152 && relativeX <= 158) {
-                addRoad(new Road(1, 0, 1));
-                System.out.println("Road added: 1, 0, 1");
-            }
-            if (-28 <= relativeY && relativeY <= -23 && relativeX >= 154 && relativeX <= 160) {
-                addRoad(new Road(1, 4, 5));
-                System.out.println("Road added: 1, 4, 5");
-            }
-            if (-6 <= relativeY && relativeY <= 1 && relativeX >= 169 && relativeX <= 175) {
-                addRoad(new Road(1, 0, 5));
-                System.out.println("Road added: 1, 0, 5");
-            }
-            if (76 <= relativeY && relativeY <= 82 && relativeX >= 64 && relativeX <= 72) {
-                addRoad(new Road(3, 0, 1));
-                System.out.println("Road added: 3, 0, 1");
-            }
-            if (62 <= relativeY && relativeY <= 70 && relativeX >= 38 && relativeX <= 46) {
-                addRoad(new Road(3, 0, 2));
-                System.out.println("Road added: 3, 0, 2");
-            }
-            if (31 <= relativeY && relativeY <= 38 && relativeX >= 38 && relativeX <= 46) {
-                addRoad(new Road(3, 0, 3));
-                System.out.println("Road added: 3, 0, 3");
-            }
-            if (-26 <= relativeY && relativeY <= -20 && relativeX >= 182 && relativeX <= 190) {
-                addRoad(new Road(2, 3, 4));
-                System.out.println("Road added: 2, 3, 4");
-            }
-            if (-26 <= relativeY && relativeY <= -20 && relativeX >= 205 && relativeX <= 212) {
-                addRoad(new Road(2, 4, 5));
-                System.out.println("Road added: 2, 4, 5");
-            }
-            if (-8 <= relativeY && relativeY <= 2 && relativeX >= 222 && relativeX <= 228) {
-                addRoad(new Road(2, 5, 6));
-                System.out.println("Road added: 2, 5, 6");
-            }
-            if (17 <= relativeY && relativeY <= 25 && relativeX >= 178 && relativeX <= 185) {
-                addRoad(new Road(2, 2, 1));
-                System.out.println("Road added: 2, 2, 1");
-            }
-            if (17 <= relativeY && relativeY <= 25 && relativeX >= 204 && relativeX <= 212) {
-                addRoad(new Road(2, 6, 1));
-                System.out.println("Road added: 2, 6, 1");
-            }
-            if (17 <= relativeY && relativeY <= 25 && relativeX >= 55 && relativeX <= 62) {
-                addRoad(new Road(3, 3, 4));
-                System.out.println("Road added: 3, 3, 4");
-            }
-            if (38 <= relativeY && relativeY <= 44 && relativeX >= 92 && relativeX <= 97) {
-                addRoad(new Road(3, 5, 0));
-                System.out.println("Road added: 3, 5, 0");
-            }
-            if (38 <= relativeY && relativeY <= 44 && relativeX >= 42 && relativeX <= 47) {
-                addRoad(new Road(3, 3, 2));
-                System.out.println("Road added: 3, 3, 2");
-            }
-            if (60 <= relativeY && relativeY <= 64 && relativeX >= 55 && relativeX <= 60) {
-                addRoad(new Road(3, 1, 2));
-                System.out.println("Road added: 3, 1, 2");
-            }
-
-            if (62 <= relativeY && relativeY <= 67 && relativeX >= 82 && relativeX <= 87) {
-                addRoad(new Road(3, 1, 0));
-                System.out.println("Road added: 3, 1, 0");
-            }
-            if (38 <= relativeY && relativeY <= 44 && relativeX >= 142 && relativeX <= 147) {
-                addRoad(new Road(4, 5, 6));
-                System.out.println("Road added: 4, 5, 6");
-            }
-            if (62 <= relativeY && relativeY <= 67 && relativeX >= 132 && relativeX <= 137) {
-                addRoad(new Road(4, 1, 0));
-                System.out.println("Road added: 4, 1, 0");
-            }
-            if (62 <= relativeY && relativeY <= 67 && relativeX >= 105 && relativeX <= 110) {
-                addRoad(new Road(4, 2, 1));
-                System.out.println("Road added: 4, 2, 1");
-            }
-            if (62 <= relativeY && relativeY <= 67 && relativeX >= 157 && relativeX <= 163) {
-                addRoad(new Road(5, 1, 2));
-                System.out.println("Road added: 5, 1, 2");
-            }
-            if (38 <= relativeY && relativeY <= 44 && relativeX >= 188 && relativeX <= 196) {
-                addRoad(new Road(5, 5, 0));
-                System.out.println("Road added: 5, 5, 0");
-            }
-            if (64 <= relativeY && relativeY <= 70 && relativeX >= 178 && relativeX <= 184) {
-                addRoad(new Road(5, 0, 1));
-                System.out.println("Road added: 5, 0, 1");
-            }
-            if (18 <= relativeY && relativeY <= 25 && relativeX >= 228 && relativeX <= 235) {
-                addRoad(new Road(6, 4, 5));
-                System.out.println("Road added: 6, 4, 5");
-            }
-            if (38 <= relativeY && relativeY <= 45 && relativeX >= 243 && relativeX <= 248) {
-                addRoad(new Road(6, 0, 5));
-                System.out.println("Road added: 6, 0, 5");
-            }
-            if (61 <= relativeY && relativeY <= 67 && relativeX >= 206 && relativeX <= 211) {
-                addRoad(new Road(6, 1, 2));
-                System.out.println("Road added: 6, 1, 2");
-            }
-            if (61 <= relativeY && relativeY <= 67 && relativeX >= 229 && relativeX <= 235) {
-                addRoad(new Road(6, 0, 1));
-                System.out.println("Road added: 6, 0, 1");
-            }
-            if (86 <= relativeY && relativeY <= 91 && relativeX >= 67 && relativeX <= 75) {
-                addRoad(new Road(7, 5, 0));
-                System.out.println("Road added: 7, 5, 0");
-            }
-            if (64 <= relativeY && relativeY <= 69 && relativeX >= 30 && relativeX <= 38) {
-                addRoad(new Road(7, 3, 4));
-                System.out.println("Road added: 7, 3, 4");
-            }
-            if (106 <= relativeY && relativeY <= 114 && relativeX >= 16 && relativeX <= 24) {
-                addRoad(new Road(7, 2, 3));
-                System.out.println("Road added: 7, 2, 3");
-            }
-            if (76 <= relativeY && relativeY <= 84 && relativeX >= 16 && relativeX <= 24) {
-                addRoad(new Road(7, 0, 3));
-                System.out.println("Road added: 7, 0, 3");
-            }
-            if (108 <= relativeY && relativeY <= 113 && relativeX >= 55 && relativeX <= 60) {
-                addRoad(new Road(7, 0, 1));
-                System.out.println("Road added: 7, 0, 1");
-            }
-            if (82 <= relativeY && relativeY <= 90 && relativeX >= 72 && relativeX <= 78) {
-                addRoad(new Road(7, 0, 5));
-                System.out.println("Road added: 7, 0, 5");
-            }
-            if (105 <= relativeY && relativeY <= 111 && relativeX >= 28 && relativeX <= 36) {
-                addRoad(new Road(7, 1, 2));
-                System.out.println("Road added: 7, 1, 2");
-            }
-            if (84 <= relativeY && relativeY <= 90 && relativeX >= 21 && relativeX <= 26) {
-                addRoad(new Road(7, 2, 3));
-                System.out.println("Road added: 7, 2, 3");
-            }
-            if (84 <= relativeY && relativeY <= 90 && relativeX >= 120 && relativeX <= 126) {
-                addRoad(new Road(8, 0, 5));
-                System.out.println("Road added: 8, 0, 5");
-            }
-            if (107 <= relativeY && relativeY <= 113 && relativeX >= 82 && relativeX <= 88) {
-                addRoad(new Road(8, 1, 2));
-                System.out.println("Road added: 8, 1, 2");
-            }
-            if (107 <= relativeY && relativeY <= 113 && relativeX >= 107 && relativeX <= 113) {
-                addRoad(new Road(8, 0, 1));
-                System.out.println("Road added: 8, 0, 1");
-            }
-            if (85 <= relativeY && relativeY <= 90 && relativeX >= 168 && relativeX <= 175) {
-                addRoad(new Road(9, 5, 0));
-                System.out.println("Road added: 9, 5, 0");
-            }
-            if (106 <= relativeY && relativeY <= 111 && relativeX >= 128 && relativeX <= 133) {
-                addRoad(new Road(9, 1, 2));
-                System.out.println("Road added: 9, 1, 2");
-            }
-            if (106 <= relativeY && relativeY <= 111 && relativeX >= 155 && relativeX <= 160) {
-                addRoad(new Road(9, 0, 1));
-                System.out.println("Road added: 9, 0, 1");
-            }
-            if (80 <= relativeY && relativeY <= 86 && relativeX >= 216 && relativeX <= 224) {
-                addRoad(new Road(10, 5, 0));
-                System.out.println("Road added: 10, 5, 0");
-            }
-            if (108 <= relativeY && relativeY <= 113 && relativeX >= 204 && relativeX <= 210) {
-                addRoad(new Road(10, 0, 1));
-                System.out.println("Road added: 10, 0, 1");
-            }
-
-            if (108 <= relativeY && relativeY <= 113 && relativeX >= 180 && relativeX <= 186) {
-                addRoad(new Road(10, 1, 2));
-                System.out.println("Road added: 10, 1, 2");
-            }
-            if (60 <= relativeY && relativeY <= 66 && relativeX >= 253 && relativeX <= 261) {
-                addRoad(new Road(11, 4, 5));
-                System.out.println("Road added: 11, 4, 5");
-            }
-            if (81 <= relativeY && relativeY <= 87 && relativeX >= 265 && relativeX <= 273) {
-                addRoad(new Road(11, 5, 0));
-                System.out.println("Road added: 11, 5, 0");
-            }
-            if (108 <= relativeY && relativeY <= 114 && relativeX >= 255 && relativeX <= 260) {
-                addRoad(new Road(11, 0, 1));
-                System.out.println("Road added: 11, 0, 1");
-            }
-            if (107 <= relativeY && relativeY <= 112 && relativeX >= 230 && relativeX <= 236) {
-                addRoad(new Road(11, 1, 2));
-                System.out.println("Road added: 11, 1, 2");
-            }
-            if (126 <= relativeY && relativeY <= 132 && relativeX >= 93 && relativeX <= 99) {
-                addRoad(new Road(12, 5, 0));
-                System.out.println("Road added: 12, 5, 0");
-            }
-            if (153 <= relativeY && relativeY <= 159 && relativeX >= 80 && relativeX <= 86) {
-                addRoad(new Road(12, 0, 1));
-                System.out.println("Road added: 12, 0, 1");
-            }
-            if (150 <= relativeY && relativeY <= 156 && relativeX >= 53 && relativeX <= 58) {
-                addRoad(new Road(12, 1, 2));
-                System.out.println("Road added: 12, 1, 2");
-            }
-            if (131 <= relativeY && relativeY <= 137 && relativeX >= 41 && relativeX <= 47) {
-                addRoad(new Road(12, 2, 3));
-                System.out.println("Road added: 12, 2, 3");
-            }
-            if (131 <= relativeY && relativeY <= 137 && relativeX >= 41 && relativeX <= 47) {
-                addRoad(new Road(12, 2, 3));
-                System.out.println("Road added: 12, 2, 3");
-            }
-            if (125 <= relativeY && relativeY <= 131 && relativeX >= 141 && relativeX <= 147) {
-                addRoad(new Road(13, 0, 5));
-                System.out.println("Road added: 13, 0, 5");
-            }
-            if (154 <= relativeY && relativeY <= 160 && relativeX >= 130 && relativeX <= 136) {
-                addRoad(new Road(13, 0, 1));
-                System.out.println("Road added: 13, 0, 1");
-            }
-            if (149 <= relativeY && relativeY <= 155 && relativeX >= 107 && relativeX <= 113) {
-                addRoad(new Road(13, 1, 2));
-                System.out.println("Road added: 13, 1, 2");
-            }
-            if (128 <= relativeY && relativeY <= 134 && relativeX >= 193 && relativeX <= 200) {
-                addRoad(new Road(14, 0, 5));
-                System.out.println("Road added: 14, 0, 5");
-            }
-            if (149 <= relativeY && relativeY <= 155 && relativeX >= 180 && relativeX <= 186) {
-                addRoad(new Road(14, 0, 1));
-                System.out.println("Road added: 14, 0, 1");
-            }
-            if (149 <= relativeY && relativeY <= 155 && relativeX >= 156 && relativeX <= 161) {
-                addRoad(new Road(14, 1, 2));
-                System.out.println("Road added: 14, 1, 2");
-            }
-            if (129 <= relativeY && relativeY <= 135 && relativeX >= 242 && relativeX <= 248) {
-                addRoad(new Road(15, 0, 5));
-                System.out.println("Road added: 15, 0, 5");
-            }
-            if (149 <= relativeY && relativeY <= 155 && relativeX >= 231 && relativeX <= 237) {
-                addRoad(new Road(15, 0, 1));
-                System.out.println("Road added: 15, 0, 1");
-            }
-            if (149 <= relativeY && relativeY <= 155 && relativeX >= 204 && relativeX <= 210) {
-                addRoad(new Road(15, 1, 2));
-                System.out.println("Road added: 15, 1, 2");
-            }
-            if (173 <= relativeY && relativeY <= 179 && relativeX >= 120 && relativeX <= 126) {
-                addRoad(new Road(16, 0, 5));
-                System.out.println("Road added: 16, 0, 5");
-            }
-            if (197 <= relativeY && relativeY <= 203 && relativeX >= 107 && relativeX <= 113) {
-                addRoad(new Road(16, 1, 0));
-                System.out.println("Road added: 16, 1, 0");
-            }
-            if (197 <= relativeY && relativeY <= 203 && relativeX >= 83 && relativeX <= 89) {
-                addRoad(new Road(16, 1, 2));
-                System.out.println("Road added: 16, 1, 2");
-            }
-            if (170 <= relativeY && relativeY <= 175 && relativeX >= 72 && relativeX <= 79) {
-                addRoad(new Road(16, 2, 3));
-                System.out.println("Road added: 16, 2, 3");
-            }
-
-            if (173 <= relativeY && relativeY <= 179 && relativeX >= 170 && relativeX <= 176) {
-                addRoad(new Road(17, 0, 5));
-                System.out.println("Road added: 17, 0, 5");
-            }
-            if (197 <= relativeY && relativeY <= 204 && relativeX >= 155 && relativeX <= 161) {
-                addRoad(new Road(17, 1, 0));
-                System.out.println("Road added: 17, 1, 0");
-            }
-            if (197 <= relativeY && relativeY <= 203 && relativeX >= 132 && relativeX <= 138) {
-                addRoad(new Road(17, 1, 2));
-                System.out.println("Road added: 17, 1, 2");
-            }
-
-            if (170 <= relativeY && relativeY <= 176 && relativeX >= 221 && relativeX <= 227) {
-                addRoad(new Road(18, 0, 5));
-                System.out.println("Road added: 18, 0, 5");
-            }
-            if (197 <= relativeY && relativeY <= 204 && relativeX >= 209 && relativeX <= 215) {
-                addRoad(new Road(18, 1, 0));
-                System.out.println("Road added: 18, 1, 0");
-            }
-            if (197 <= relativeY && relativeY <= 203 && relativeX >= 182 && relativeX <= 188) {
-                addRoad(new Road(18, 1, 2));
-                System.out.println("Road added: 18, 1, 2");
-            }
-        }
-
+        if(mode==1){villageGui(relativeX, relativeY,ownerAbstarct);}
+        if (mode==2) {cityGui(relativeX, relativeY);}
+        if (mode == 3) {roadGui(relativeX, relativeY);}
     }
+    public void villageGui(int relativeX, int relativeY, int owner) {
+        int temp=0;
+        while(temp==villages.size()){
+        for (int[] coordinates : VILLAGE_City_COORDINATES) {
+            int index = coordinates[0], vertex = coordinates[1], minY = coordinates[2], maxY = coordinates[3], minX = coordinates[4], maxX = coordinates[5];
+            if (relativeY >= minY && relativeY <= maxY && relativeX >= minX && relativeX <= maxX) {
+                addVillage(index, vertex);
+                System.out.println("Village added at index " + index + " and vertex " + vertex+" and owner "+ owner);
+                return;}}}}
+    public void cityGui(int relativeX, int relativeY) {
+        for (int[] coordinates : VILLAGE_City_COORDINATES) {
+            int index = coordinates[0];
+            int vertex = coordinates[1];
+            int minY = coordinates[2];
+            int maxY = coordinates[3];
+            int minX = coordinates[4];
+            int maxX = coordinates[5];
+            if (relativeY >= minY && relativeY <= maxY && relativeX >= minX && relativeX <= maxX) {
+                addCity(index, vertex);
+                System.out.println("City added at index " + index + " and vertex " + vertex);
+                return;  // Exit the function
+            }
+        }
+    }
+
+    public void roadGui(int relativeX, int relativeY) {
+        for (int[] roadData : roadCoordinates) {
+            int hexIndex = roadData[0];
+            int minY = roadData[1], maxY = roadData[2];
+            int minX = roadData[3], maxX = roadData[4];
+            int vertex1 = roadData[6], vertex2 = roadData[7];
+            if (minY <= relativeY && relativeY <= maxY && minX <= relativeX && relativeX <= maxX) {
+                addRoad(new Road(hexIndex, vertex1, vertex2));
+                System.out.println("Road added: " + hexIndex + ", " + vertex1 + ", " + vertex2);
+            }
+        }
+    }
+
     public void addVillage(int index, int vertex) {
-        villages.computeIfAbsent(index, k -> new HashSet<>()).add(vertex);
-        repaint();
-    }
+        System.out.println("k"+ownerAbstarct);
+        for (Village village : villages) {
+            if (village.getIndex() == index && village.getVertex() == vertex) {
+                System.out.println("This location is already occupied.");
+                return;}}
+        villages.add(new Village(index, vertex, ownerAbstarct));
+        repaint();}
 
     public void addCity(int index, int vertex) {
         cities.computeIfAbsent(index, k -> new HashSet<>()).add(vertex);
@@ -733,12 +290,10 @@ public class Board extends JPanel implements MouseListener {
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
-    }
+    public void mousePressed(MouseEvent e) {}
 
     @Override
-    public void mouseReleased(MouseEvent e) {
-    }
+    public void mouseReleased(MouseEvent e){}
 
     @Override
     public void mouseEntered(MouseEvent e) {

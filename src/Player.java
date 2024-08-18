@@ -1,6 +1,7 @@
+import java.util.ArrayList;
+
 public class Player {
     private int number;
-    private int numberOfVillages;
     private int numberOfCities;
     private boolean playerPlay;
     private int devCardKnight=0;
@@ -8,9 +9,9 @@ public class Player {
     private int YearPlenty=0;
     private int Monopoly=0;
     private int VictoryPoint=0;
-    public Player(int number, int numberOfVillages, int numberOfCities, boolean playerPlay, int devCardKnight,int RoadBuilding, int YearPlenty, int Monopoly, int VictoryPoint) {
+    private ArrayList<Village> villages;
+    public Player(int number, ArrayList<Village> villages , int numberOfCities, boolean playerPlay, int devCardKnight,int RoadBuilding, int YearPlenty, int Monopoly, int VictoryPoint) {
         this.number = number;
-        this.numberOfVillages = numberOfVillages;
         this.numberOfCities = numberOfCities;
         this.playerPlay = playerPlay;
         this.devCardKnight=devCardKnight;
@@ -18,14 +19,21 @@ public class Player {
         this.YearPlenty=YearPlenty;
         this.Monopoly=Monopoly;
         this.VictoryPoint=VictoryPoint;
+        this.villages=villages;
     }
 
+    public ArrayList<Village> getVillages() {
+        return villages;
+    }
+    public void addVillage(Village v){
+        this.villages.add(new Village(v.index, v.vertex, number));
+    }
     public int getNumber() {
         return number;
     }
 
     public int getNumberOfVillages() {
-        return numberOfVillages;
+        return villages.size();
     }
 
     public int getNumberOfCities() {
@@ -35,12 +43,6 @@ public class Player {
     public boolean isPlayerPlay() {
         return playerPlay;
     }
-
-    // Setters
-    public void setNumberOfVillages(int numberOfVillages) {
-        this.numberOfVillages = numberOfVillages;
-    }
-
     public void setNumberOfCities(int numberOfCities) {
         this.numberOfCities = numberOfCities;
     }

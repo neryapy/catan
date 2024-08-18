@@ -6,21 +6,39 @@ import javax.imageio.*;
 import java.util.*;
 import java.util.List;
 
-public class Main {
+public class Main extends Board{
     private static Map<String, Integer> devCardList = new HashMap<>();
     private static Random random = new Random();
-    public static void main(String[] args) {
+    public int playerPlayActually;
+    JPanel mainPanel = new JPanel();
+    public void main(String[] args) {
         JFrame frame = new JFrame();
         Board board = new Board();
         frame.add(board);
         frame.setSize(800, 600);
-        //board.addVillage(18,0);
-        //board.addVillage(18,1);
-        //board.addVillage(16,2);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+        satrtGame();
     }
+    public void satrtGame(){
+        Player p1 = new Player(1, new ArrayList<Village>(1), 0, false, 0, 0, 0, 0, 0);
+        Player p2 = new Player(2, new ArrayList<Village>(1), 0, false, 0, 0, 0, 0, 0);
+        Player p3 = new Player(3, new ArrayList<Village>(1), 0, false, 0, 0, 0, 0, 0);
+        Player p4 = new Player(4, new ArrayList<Village>(1), 0, false, 0, 0, 0, 0, 0);
+        addVillageWithOwner(1);
 
+    }
+    private void addVillageWithOwner(int owner){
+        mode=1;
+        ownerAbstarct=owner;
+        try {
+            Thread.sleep(3000); // Sleep for 1000 milliseconds (1 second)
+            mode=0;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
     private static void initializeDevCards() {
         devCardList.put("Knights", 14);
         devCardList.put("Road Building", 2);

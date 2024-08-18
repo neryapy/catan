@@ -12,6 +12,10 @@ public class City {
     public void printVertex() {
         System.out.println("City at resource index: " + locationRes + ", vertex: " + locationVertex);
     }
+    public Point getCoordinates(List<HexagonResource> hexagons) {
+        HexagonResource hex = hexagons.get(locationRes);
+        return hex.getVertex(locationVertex);
+    }
     public void draw(Graphics2D g2d, List<HexagonResource> hexagons) {
         // Retrieve the hexagon and the vertex
         HexagonResource hex = hexagons.get(locationRes);

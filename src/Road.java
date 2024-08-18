@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.awt.geom.Line2D;
 import java.util.List;
 
 public class Road {
@@ -26,8 +25,10 @@ public class Road {
         g2d.drawLine(vertex1.x, vertex1.y, vertex2.x, vertex2.y);
     }
 
-
-    public int getIndex() {
-        return index;
+    public Point[] getCoordinates(List<HexagonResource> hexagons) {
+        HexagonResource hex = hexagons.get(index);
+        Point vertex1 = hex.getVertex(locationVertex1);
+        Point vertex2 = hex.getVertex(locationVertex2);
+        return new Point[]{vertex1, vertex2};
     }
 }

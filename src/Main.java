@@ -10,22 +10,9 @@ public class Main extends Board{
     private static Map<String, Integer> devCardList = new HashMap<>();
     private static Random random = new Random();
     public int playerPlayActually;
-    JPanel mainPanel = new JPanel();
-    public void main(String[] args) {
-        JFrame frame = new JFrame();
+    public static void main(String[] args) {
         Board board = new Board();
-        frame.add(board);
-        frame.setSize(800, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-        satrtGame();
-    }
-    public void satrtGame(){
-        Player p1 = new Player(1, new ArrayList<Village>(1), 0, false, 0, 0, 0, 0, 0);
-        Player p2 = new Player(2, new ArrayList<Village>(1), 0, false, 0, 0, 0, 0, 0);
-        Player p3 = new Player(3, new ArrayList<Village>(1), 0, false, 0, 0, 0, 0, 0);
-        Player p4 = new Player(4, new ArrayList<Village>(1), 0, false, 0, 0, 0, 0, 0);
-        addVillageWithOwner(1);
+        board.exportGameState();
 
     }
     private void addVillageWithOwner(int owner){

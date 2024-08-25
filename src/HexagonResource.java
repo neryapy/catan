@@ -17,6 +17,8 @@ public class HexagonResource implements Comparable<HexagonResource> {
         this.index = index;
     }
 
+    public int getSize() {return size;}
+
     public int getX() {
         return x;
     }
@@ -54,8 +56,6 @@ public class HexagonResource implements Comparable<HexagonResource> {
     }
     public void draw(Graphics2D g2d) {
         Polygon hexagon = getHexagonShape();
-
-        // Set color based on resource type
         switch (resourceType) {
             case "Wood":
                 g2d.setColor(new Color(161, 102, 47));

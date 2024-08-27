@@ -1,32 +1,28 @@
-import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class HexagonResource implements Comparable<HexagonResource> {
-    private int x, y; // Center of the hexagon
     private String resourceType;
-    public int number;
-    private int size;
+    private int number;
     private int index;
+    private List<vertex> vertices;
 
-    public HexagonResource(int x, int y, String resourceType, int number, int size, int index) {
-        this.x = x;
-        this.y = y;
+    public HexagonResource(String resourceType, int number, int index) {
         this.resourceType = resourceType;
         this.number = number;
-        this.size = size;
         this.index = index;
+        this.vertices = new ArrayList<>();
+        initializeVertices();
     }
 
-    public int getSize() {return size;}
-
-    public int getX() {
-        return x;
+    private void initializeVertices() {
+        for (int i = 0; i < 6; i++) { // Hexagon has 6 vertices
+            vertex v = new vertex(i);
+            v.connectHexagon(index);
+            vertices.add(v);
+        }
     }
-
-    public int getY() {
-        return y;
-    }
-
     public int getIndex() {
         return index;
     }
@@ -39,66 +35,12 @@ public class HexagonResource implements Comparable<HexagonResource> {
         return number;
     }
 
-    public Polygon getHexagonShape() {
-        int[] xPoints = new int[6];
-        int[] yPoints = new int[6];
-        for (int i = 0; i < 6; i++) {
-            xPoints[i] = (int) (x + size * Math.cos(Math.toRadians(60 * i + 30)));
-            yPoints[i] = (int) (y + size * Math.sin(Math.toRadians(60 * i + 30)));
-        }
-        return new Polygon(xPoints, yPoints, 6);
+    public List<vertex> getVertices() {
+        return vertices;
     }
 
-    public Point getVertex(int vertexIndex) {
-        int vertexX = (int) (x + size * Math.cos(Math.toRadians(60 * vertexIndex + 30)));
-        int vertexY = (int) (y + size * Math.sin(Math.toRadians(60 * vertexIndex + 30)));
-        return new Point(vertexX, vertexY);
-    }
-    public void draw(Graphics2D g2d) {
-        Polygon hexagon = getHexagonShape();
-        switch (resourceType) {
-            case "Wood":
-                g2d.setColor(new Color(161, 102, 47));
-                break;
-            case "Brick":
-                g2d.setColor(new Color(227, 118, 25));
-                break;
-            case "Wheat":
-                g2d.setColor(new Color(255, 215, 0));
-                break;
-            case "Sheep":
-                g2d.setColor(new Color(105, 150, 0));
-                break;
-            case "Ore":
-                g2d.setColor(new Color(156, 141, 118));
-                break;
-            case "Desert":
-                g2d.setColor(new Color(210, 180, 140));
-                break;
-            default:
-                g2d.setColor(Color.BLACK);
-                break;
-        }
-
-        // Draw the hexagon
-        g2d.fill(hexagon);
-        g2d.setColor(Color.BLACK);
-        g2d.draw(hexagon);
-
-        g2d.setFont(new Font("Arial", Font.BOLD, 12));
-        FontMetrics metrics = g2d.getFontMetrics();
-
-        // Center text horizontally and vertically within the hexagon
-        String resourceText = resourceType;
-        int resourceTextWidth = metrics.stringWidth(resourceText);
-        int resourceTextHeight = metrics.getAscent();
-        g2d.setColor(Color.WHITE);
-        g2d.drawString(resourceText, x - resourceTextWidth / 2, y - size / 2 + resourceTextHeight / 2);
-
-        String numberText = String.valueOf(number);
-        int numberTextWidth = metrics.stringWidth(numberText);
-        int numberTextHeight = metrics.getAscent();
-        g2d.drawString(numberText, x - numberTextWidth / 2, y + size / 2 - numberTextHeight / 2);
+    public vertex getVertex(int vertexIndex) {
+        return vertices.get(vertexIndex);
     }
 
     @Override

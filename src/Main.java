@@ -11,20 +11,14 @@ public class Main extends Board{
     private static Random random = new Random();
     public int playerPlayActually;
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
         Board board = new Board();
+        Player p1=new Player(1);
+        Player p2=new Player(2);
+        Player p3=new Player(3);
+        Player p4=new Player(4);
+        p1.addVillage(new Village(scanner.nextInt(), scanner.nextInt(), 1));
         board.exportGameState();
-
-    }
-    private void addVillageWithOwner(int owner){
-        mode=1;
-        ownerAbstarct=owner;
-        try {
-            Thread.sleep(3000); // Sleep for 1000 milliseconds (1 second)
-            mode=0;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
     }
     private static void initializeDevCards() {
         devCardList.put("Knights", 14);

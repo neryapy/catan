@@ -14,7 +14,7 @@ public class Ui extends JPanel {
     private ArrayList<Point> centerPoints = new ArrayList<>();
     private HashMap<JButton, Integer> buttonsVertex = new HashMap<JButton, Integer>(); // HashMap to store index and value 1
     private ArrayList<Point> coloredVertices = new ArrayList<>();
-
+    private ArrayList<JPanel> resourceCircles = new ArrayList<>();
     public Ui(Board board) {
         this.setBackground(new Color(14, 150, 212));
         // Create the window (JFrame) when Ui is instantiated
@@ -42,8 +42,9 @@ public class Ui extends JPanel {
         buildLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         rightPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        rightPanel.add(buildLabel);
         rightPanel.add(playerPlayLabel);
+        rightPanel.add(buildLabel);
+
         rightPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         // Create beautiful buttons with rounded corners and hover effects
         JButton villageButton = createStyledButton("Village");
@@ -56,10 +57,22 @@ public class Ui extends JPanel {
         rightPanel.add(cityButton);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         rightPanel.add(roadButton);
+// Add this code after creating and positioning the "Road" button in the constructor:
+
+// Create a panel to hold resource circles
+        JPanel resourcePanel = new JPanel();
+        resourcePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 5)); // Horizontal alignment with padding
+        resourcePanel.setBounds(20, 200, 250, 50); // Position below the "Road" button
+        resourcePanel.setBackground(new Color(60, 63, 65)); // Match the background color of the right panel
+
+// Add the resource panel to the rightPanel
+        rightPanel.add(resourcePanel);
+
         villageButton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 colorAllVertices();  // Color all vertices when pressed
+
             }
         });
         JButton endTurnButton = createStyledButton("End My Turn");
@@ -98,7 +111,96 @@ public class Ui extends JPanel {
                 clearClickedVertex(clickedPoint);
             }
         });
+        // Panel and button setup
+        rightPanel.setLayout(null); // Set layout to null for absolute positioning
 
+// "BUILD" Label
+        buildLabel.setBounds(90, 20, 120, 40); // Position "BUILD" label at the top center
+        rightPanel.add(buildLabel);
+
+// Village Button
+        villageButton.setBounds(20, 80, 120, 45); // Positioned below "BUILD" label at the bottom-left
+        rightPanel.add(villageButton);
+
+// City Button
+        cityButton.setBounds(150, 80, 120, 45); // Positioned to the right of "Village" button
+        rightPanel.add(cityButton);
+
+// Road Button
+        roadButton.setBounds(20, 140, 120, 45); // Positioned below "Village" button
+        rightPanel.add(roadButton);
+
+// End Turn Button
+        endTurnButton.setBounds(150, 515, 150, 40); // Positioned at the bottom center
+        rightPanel.add(endTurnButton);
+
+        playerPlayLabel.setBounds(90, -5, 200, 40); // Adjust position and size as needed
+        rightPanel.add(playerPlayLabel);
+
+
+        Color[] colors = {
+                getResourceColor("grain"),
+                getResourceColor("wool"),
+                getResourceColor("ore"),
+                getResourceColor("brick"),
+                getResourceColor("lumber")
+        };
+        board.players.get(playerPlayNum(board.players)).addResource(new Resource("grain"));
+        for (int i = 0; i < colors.length; i++) {
+            String resourceType = ""; // Assign resource types based on your game logic order
+            switch (i) {
+                case 0: resourceType = "grain"; break;
+                case 1: resourceType = "wool"; break;
+                case 2: resourceType = "ore"; break;
+                case 3: resourceType = "brick"; break;
+                case 4: resourceType = "lumber"; break;
+            }
+
+            int finalI = i;
+            String finalResourceType = resourceType;
+            JPanel circlePanel = new JPanel() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    g.setColor(colors[finalI]);
+                    g.fillOval(0, 0, 30, 30); // Draw the circle with the resource color
+
+                    // Count the resource quantity
+                    int resourceCount = 0;
+                    for (Resource res : board.players.get(playerPlayNum(board.players)).getResources()) {
+                        if (res.getType().equalsIgnoreCase(finalResourceType)) {
+                            resourceCount++;
+                        }
+                    }
+
+                    // Draw the resource count
+                    g.setColor(Color.BLACK);
+                    g.setFont(new Font("Arial", Font.BOLD, 12));
+                    g.drawString(String.valueOf(resourceCount), 12, 20); // Display the count in the center
+                }
+            };
+
+            circlePanel.setPreferredSize(new Dimension(30, 30));
+            resourceCircles.add(circlePanel);
+            resourcePanel.add(circlePanel);
+            repaint();
+        }
+
+
+        rightPanel.add(resourcePanel);
+
+        // Add action listener for End Turn button
+        endTurnButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // existing end-turn code ...
+
+                // Refresh the circles to show updated colors or numbers if needed
+                for (JPanel circle : resourceCircles) {
+                    circle.repaint(); // Redraw each circle
+                }
+            }
+        });
         // Set frame properties and add components
         frame.setLayout(new BorderLayout());
         frame.add(this, BorderLayout.CENTER); // Add the hexagon drawing panel

@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Player {
@@ -11,7 +10,7 @@ public class Player {
     private ArrayList<Village> villages;
     private ArrayList<City> citys;
     private ArrayList<Road> roads;
-    private ArrayList<Resource> resources=new ArrayList<>();
+    public ArrayList<Resource> resources=new ArrayList<>();
     public Player(int number) {
         this.number = number;
         this.playerPlay = false; // Initialize with false or another appropriate value
@@ -20,7 +19,7 @@ public class Player {
         this.roads=new ArrayList<>();
     }
     public void buyDevCard(){
-        ArrayList<Resource> requirements=new ArrayList<>(3);
+        ArrayList<Resource> requirements=new ArrayList<>();
         requirements.add(new Resource("wool"));
         requirements.add(new Resource("ore"));
         requirements.add(new Resource("grain"));
@@ -32,6 +31,7 @@ public class Player {
         else{
             if(!resources.containsAll(requirements)){
                 System.out.println("you haven't the require resource for buy dev card");
+                
             }
             else{
                 System.out.println("the pil of dev cards are empty");
@@ -85,7 +85,9 @@ public class Player {
             System.out.println("you have used a knight");
         }
     }
-    public void addResource(Resource resource){Resources.add(resource);}
+    public void addResource(Resource resource){
+        Resources.add(resource);
+        System.out.println(resources.size());}
     public void addResources(ArrayList<Resource> r){
         for(int i=0; i<r.size(); i++){
             resources.add(r.get(i));}}
@@ -140,5 +142,15 @@ public class Player {
     }
     public void setPlayerPlay(boolean playerPlay) {
         this.playerPlay = playerPlay;
+    }
+    public void Resourceshastype(){
+        System.out.println(resources.size());
+        for(int i=0; i<resources.size(); i++){
+            System.out.println(resources.size()+" "+resources.get(i).getType());
+        }
+        
+    }
+    public void addResourcebytype(String type){
+        resources.add(new Resource(type));
     }
 }

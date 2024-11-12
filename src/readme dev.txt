@@ -1,0 +1,1 @@
+for add a resource for player you need to use player.resource.add

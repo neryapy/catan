@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Ui extends JPanel {
 
@@ -15,6 +16,7 @@ public class Ui extends JPanel {
     private HashMap<JButton, Integer> buttonsVertex = new HashMap<JButton, Integer>(); // HashMap to store index and value 1
     private ArrayList<Point> coloredVertices = new ArrayList<>();
     private ArrayList<JPanel> resourceCircles = new ArrayList<>();
+    private JPanel circlePanel;
     public Ui(Board board) {
         this.setBackground(new Color(14, 150, 212));
         // Create the window (JFrame) when Ui is instantiated
@@ -25,7 +27,6 @@ public class Ui extends JPanel {
         System.out.println();
         // Set the layout for custom button placement
         this.setLayout(null);
-
         // Create a panel for the right-side menu with a background color
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
@@ -50,8 +51,9 @@ public class Ui extends JPanel {
         JButton villageButton = createStyledButton("Village");
         JButton cityButton = createStyledButton("City");
         JButton roadButton = createStyledButton("Road");
-
+        JButton buyDevcardButton = createStyledButton("Dev card");
         // Add buttons to the panel
+        rightPanel.add(buyDevcardButton);
         rightPanel.add(villageButton);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         rightPanel.add(cityButton);
@@ -62,17 +64,57 @@ public class Ui extends JPanel {
 // Create a panel to hold resource circles
         JPanel resourcePanel = new JPanel();
         resourcePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 5)); // Horizontal alignment with padding
-        resourcePanel.setBounds(20, 200, 250, 50); // Position below the "Road" button
+        resourcePanel.setBounds(20, 43, 250, 50); // Position below the "Road" button
         resourcePanel.setBackground(new Color(60, 63, 65)); // Match the background color of the right panel
 
 // Add the resource panel to the rightPanel
         rightPanel.add(resourcePanel);
-
         villageButton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
+                if(!board.players.get(playerPlayNum(board.players)).resources.contains(new Resource("grain"))){colorResourceAsRed(resourceCircles.get(0));}
+                if(!board.players.get(playerPlayNum(board.players)).resources.contains(new Resource("brick"))){colorResourceAsRed(resourceCircles.get(3));}
+                if(!board.players.get(playerPlayNum(board.players)).resources.contains(new Resource("lumber"))){colorResourceAsRed(resourceCircles.get(4));}
+                if(!board.players.get(playerPlayNum(board.players)).resources.contains(new Resource("wool"))){colorResourceAsRed(resourceCircles.get(1));}
+                
                 colorAllVertices();  // Color all vertices when pressed
 
+            }
+        });
+        rightPanel.add(resourcePanel);
+        roadButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                if(!board.players.get(playerPlayNum(board.players)).resources.contains(new Resource("brick"))){colorResourceAsRed(resourceCircles.get(3));}
+                if(!board.players.get(playerPlayNum(board.players)).resources.contains(new Resource("lumber"))){colorResourceAsRed(resourceCircles.get(4));}
+            }
+        });
+        cityButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                // Retrieve the current player's resources
+                ArrayList<Resource> resources = board.players.get(playerPlayNum(board.players)).resources;
+
+                // Count the occurrences of "grain" and "ore" in the resources list
+                long grainCount = resources.stream().filter(r -> r.equals(new Resource("grain"))).count();
+                long oreCount = resources.stream().filter(r -> r.equals(new Resource("ore"))).count();
+                // Check if the player has less than the required amount of each resource
+                if (grainCount < 2) {
+                    colorResourceAsRed(resourceCircles.get(0)); // Assuming grain circle is at index 0
+                }
+                if (oreCount < 3) {
+                    colorResourceAsRed(resourceCircles.get(2)); // Assuming ore circle is at index 2
+                }
+            }
+        });
+        buyDevcardButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                if(!board.players.get(playerPlayNum(board.players)).resources.contains(new Resource("grain"))){colorResourceAsRed(resourceCircles.get(0));}
+                if(!board.players.get(playerPlayNum(board.players)).resources.contains(new Resource("ore"))){colorResourceAsRed(resourceCircles.get(2));}
+                if(!board.players.get(playerPlayNum(board.players)).resources.contains(new Resource("wool"))){colorResourceAsRed(resourceCircles.get(1));}
+                board.players.get(playerPlayNum(board.players)).buyDevCard();
+                rightPanel.repaint();
             }
         });
         JButton endTurnButton = createStyledButton("End My Turn");
@@ -100,9 +142,27 @@ public class Ui extends JPanel {
                 System.out.println("Turn Ended "+(playerPlayNum(board.players)+1));
                 playerPlayLabel.setText("Player play: " + (playerPlayNum(board.players)+1));
                 repaint();
+                
             }
         });
+//
+        JButton rollDie = createStyledButton("Roll a die");
+        rollDie.setPreferredSize(new Dimension(120, 40));
+        rollDie.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // Align to the bottom with padding
+        rightPanel.add(Box.createVerticalGlue()); // Pushes the button to the bottom
+        rightPanel.add(rollDie);
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        // Set an action for the "End My Turn" button
+        rollDie.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//logic
+            }
+        });
+//
 // Add a mouse listener to detect when a vertex is clicked to clear the color
         this.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -129,10 +189,15 @@ public class Ui extends JPanel {
 // Road Button
         roadButton.setBounds(20, 140, 120, 45); // Positioned below "Village" button
         rightPanel.add(roadButton);
-
+// Buy dev card button
+        buyDevcardButton.setBounds(150, 140, 120, 45);
+        rightPanel.add(buyDevcardButton);
 // End Turn Button
-        endTurnButton.setBounds(150, 515, 150, 40); // Positioned at the bottom center
+        endTurnButton.setBounds(140, 515, 150, 40); // Positioned at the bottom center
         rightPanel.add(endTurnButton);
+// Roll a die Button
+        rollDie.setBounds(10, 515, 120, 40); // Positioned at the bottom center
+        rightPanel.add(rollDie);
 
         playerPlayLabel.setBounds(90, -5, 200, 40); // Adjust position and size as needed
         rightPanel.add(playerPlayLabel);
@@ -144,8 +209,11 @@ public class Ui extends JPanel {
                 getResourceColor("ore"),
                 getResourceColor("brick"),
                 getResourceColor("lumber")
+                
         };
-        board.players.get(playerPlayNum(board.players)).addResource(new Resource("grain"));
+
+
+        
         for (int i = 0; i < colors.length; i++) {
             String resourceType = ""; // Assign resource types based on your game logic order
             switch (i) {
@@ -158,27 +226,35 @@ public class Ui extends JPanel {
 
             int finalI = i;
             String finalResourceType = resourceType;
-            JPanel circlePanel = new JPanel() {
+            circlePanel = new JPanel() {
                 @Override
                 protected void paintComponent(Graphics g) {
                     super.paintComponent(g);
-                    g.setColor(colors[finalI]);
+                    g.setColor(colors[finalI]); // Set color for the circle
                     g.fillOval(0, 0, 30, 30); // Draw the circle with the resource color
+
+                    // Set border color to the same gray as the menu
+                    g.setColor(new Color(60, 63, 65));
+                    g.drawOval(0, 0, 30, 30); // Draw the border of the circle
 
                     // Count the resource quantity
                     int resourceCount = 0;
-                    for (Resource res : board.players.get(playerPlayNum(board.players)).getResources()) {
+                    for (Resource res : board.players.get(playerPlayNum(board.players)).resources) {
                         if (res.getType().equalsIgnoreCase(finalResourceType)) {
                             resourceCount++;
                         }
                     }
 
-                    // Draw the resource count
+                    // Draw the resource count inside the circle
                     g.setColor(Color.BLACK);
                     g.setFont(new Font("Arial", Font.BOLD, 12));
                     g.drawString(String.valueOf(resourceCount), 12, 20); // Display the count in the center
                 }
             };
+            circlePanel.setBackground(new Color(60, 63, 65)); // Match the gray menu color
+            circlePanel.setOpaque(true); // Ensure the background color is applied
+
+
 
             circlePanel.setPreferredSize(new Dimension(30, 30));
             resourceCircles.add(circlePanel);
@@ -476,5 +552,23 @@ public class Ui extends JPanel {
         for (int i = 0; i < players.size(); i++) {if (players.get(i).isPlayerPlay()) {return i;}}
         return -1;
     }
-
+    private void addResourceByPlayer(int ip, String type){Board.players.get(ip).resources.add(new Resource(type));}
+    public void colorResourceAsRed(JPanel circlePanel) {
+        // Set the inside of the circle to red
+        circlePanel.setBackground(Color.RED);
+    
+        // Create a timer to revert the color back after 2 seconds
+        Timer timer = new Timer(2000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Revert the background color back to the original resource color
+                Color originalColor=new Color(60, 63, 65);
+                // Reset the background color
+                circlePanel.setBackground(originalColor);
+            }
+        });
+        timer.setRepeats(false); // Only execute once
+        timer.start(); // Start the timer
+    }
+    
 }

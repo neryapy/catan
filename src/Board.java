@@ -1,5 +1,4 @@
 
-import java.util.List;
 import java.util.*;
 public class Board {
     public static List<HexagonResource> hexagons;
@@ -84,5 +83,9 @@ public class Board {
             players.get(players.size()).setPlayerPlay(false);
         }
         players.get(numberOfPlayer).setPlayerPlay(play);
+    }
+    public void addResourceByplayer(int pi, String typeResouce){
+        
+        players.get(pi).addResourcebytype(typeResouce);
     }
 }

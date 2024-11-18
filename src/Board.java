@@ -41,7 +41,6 @@ public class Board {
                 indexGener++;
                 HexagonResource newHex = new HexagonResource(resourceType, number, indexGener);
                 hexagons.add(newHex);
-
         }}
         printSortedHexagons();
         players.get(0).setPlayerPlay(true);

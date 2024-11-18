@@ -1,10 +1,33 @@
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.List;
+import java.awt.Point;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.Timer;
 
 public class Ui extends JPanel {
 
@@ -17,6 +40,7 @@ public class Ui extends JPanel {
     private ArrayList<Point> coloredVertices = new ArrayList<>();
     private ArrayList<JPanel> resourceCircles = new ArrayList<>();
     private JPanel circlePanel;
+    public int sumDice;
     public Ui(Board board) {
         this.setBackground(new Color(14, 150, 212));
         // Create the window (JFrame) when Ui is instantiated
@@ -146,6 +170,10 @@ public class Ui extends JPanel {
             }
         });
 //
+        JLabel cubesJLabel=new JLabel();
+        cubesJLabel.setFont(new Font("Arial", Font.BOLD, 17));
+        cubesJLabel.setForeground(Color.WHITE);
+        cubesJLabel.setText("the sum of the dice: NULL");
         JButton rollDie = createStyledButton("Roll a die");
         rollDie.setPreferredSize(new Dimension(120, 40));
         rollDie.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -159,7 +187,10 @@ public class Ui extends JPanel {
         rollDie.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//logic
+                sumDice=randomDie();
+                cubesJLabel.setText("the sum of the dice:"+sumDice);
+                rightPanel.repaint();
+                System.out.println(board.hexagons.get(0).getVertex(0).getConnectedHexagons());
             }
         });
 //
@@ -202,6 +233,8 @@ public class Ui extends JPanel {
         playerPlayLabel.setBounds(90, -5, 200, 40); // Adjust position and size as needed
         rightPanel.add(playerPlayLabel);
 
+        cubesJLabel.setBounds(20, 480, 250, 40); // Adjust position and size as needed
+        rightPanel.add(cubesJLabel);
 
         Color[] colors = {
                 getResourceColor("grain"),
@@ -503,7 +536,7 @@ public class Ui extends JPanel {
                         // If this is the clicked vertex
                         if (hexVertex.equals(vertex)) {
                             // Print the hexagon index and vertex index
-                            System.out.println("Clicked Hex Index: " + hexIndex + ", Vertex Index: " + vertexIndex);
+                            System.out.println("Clicked Hex Index: " + hexIndex + ", Vertex Index: " + vertexIndex+", connected with: "+Board.getHexagons().get(hexIndex).getVertex(vertexIndex).getConnectedHexagons()+".");
 
                             // Check the current village state at the vertex
                             boolean hasVillage = Board.getHexagons().get(hexIndex).getVertices().get(vertexIndex).getVillage();
@@ -569,6 +602,14 @@ public class Ui extends JPanel {
         });
         timer.setRepeats(false); // Only execute once
         timer.start(); // Start the timer
+    }
+    private int randomDie(){    
+        ArrayList<Integer> Cube1=new ArrayList<>();
+        for(int i=1; i<6; i++){Cube1.add(i);}
+        Collections.shuffle(Cube1);
+        int c1=Cube1.get(0);
+        Collections.shuffle(Cube1);
+        return c1+Cube1.get(0);
     }
     
 }

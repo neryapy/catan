@@ -6,7 +6,7 @@ public class HexagonResource implements Comparable<HexagonResource> {
     private String resourceType;
     private int number;
     private int index;
-    private List<vertex> vertices;
+    public List<vertex> vertices;
     private List<lineHexagon> lines;
     private boolean hasRobber=false;
 
@@ -26,14 +26,12 @@ public class HexagonResource implements Comparable<HexagonResource> {
     private void initializelines() {
         for (int i = 0; i < 6; i++) { // Hexagon has 6 vertices
             lineHexagon l = new lineHexagon(i);
-            l.connectHexagon(index);
             lines.add(l);
         }
     }
     private void initializeVertices() {
         for (int i = 0; i < 6; i++) { // Hexagon has 6 vertices
             vertex v = new vertex(i);
-            v.connectHexagon(index);
             vertices.add(v);
         }
     }

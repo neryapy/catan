@@ -1,14 +1,16 @@
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 public class vertex {
     private int index;
     private boolean village;
     private boolean city;
-    private Set<Integer> connectedHexagons;
+    
+    HashMap<Integer, Integer> connectedHexagons = new HashMap<Integer, Integer>();
     private vertex vertexPoint;
     public vertex(int index) {
         this.index = index;
-        this.connectedHexagons = new HashSet<>();
         this.village=false;
         this.city=false;
     }
@@ -30,15 +32,11 @@ public class vertex {
     public void setCity(boolean city) {
         this.city = city;
     }
-    public void connectHexagon(int hexIndex) {
-        connectedHexagons.add(hexIndex);
+    public void connectHexagon(int hexIndex, int vertexIndex) {
+        connectedHexagons.put(hexIndex, vertexIndex);
     }
 
-    public Set<Integer> getConnectedHexagons() {
+    public Map<Integer, Integer> getConnectedHexagons() {
         return connectedHexagons;
-    }
-
-    public boolean isSharedWithHexagon(int hexIndex) {
-        return connectedHexagons.contains(hexIndex);
     }
 }

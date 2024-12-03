@@ -8,7 +8,6 @@ import java.awt.FontMetrics;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.List;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -16,10 +15,8 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -28,7 +25,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-
+import javax.swing.plaf.basic.BasicBorders;
+//385
 public class Ui extends JPanel {
 
     private static final int HEX_RADIUS = 50; // Radius of the hexagons
@@ -41,7 +39,11 @@ public class Ui extends JPanel {
     private ArrayList<JPanel> resourceCircles = new ArrayList<>();
     private JPanel circlePanel;
     public int sumDice;
+    private Point[] hexMiddlePoints;
     public Ui(Board board) {
+        //create the connected vertices:
+        hexMiddlePoints = new Point[Board.hexagons.size()];
+        //end create the connected vertices.
         this.setBackground(new Color(14, 150, 212));
         // Create the window (JFrame) when Ui is instantiated
         int hexagonCount = board.getSortedHexagons().size();
@@ -317,6 +319,7 @@ public class Ui extends JPanel {
         frame.setSize(1000, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+        
     }
 
     private JButton createStyledButton(String text) {
@@ -370,17 +373,50 @@ public class Ui extends JPanel {
                 centerPoints.add(new Point((int) x, y));
                 HexagonResource hex = Board.hexagons.get(hexCount);
                 drawBeautifulHexagon(g2d, (int) x, y, HEX_RADIUS, getResourceColor(hex.getResourceType()), hex.getResourceType(), hex.getNumber());
+                hexMiddlePoints[hexCount]=new Point((int) x, y);
                 hexCount++;
             }
             rowCount++;
         }
+        
 
         // Draw vertices based on color (use the stored list of vertices)
         for (Point vertex : coloredVertices) {
             g2d.setColor(Color.GREEN); // Default to green for vertices without a village
             g2d.fillOval(vertex.x - 5, vertex.y - 5, 10, 10); // Draw vertex as a small circle
         }
-    }
+        Point[] fPoints = {
+            new Point(37, 22),
+            new Point(0, -24),
+            new Point(-48, -50),
+            new Point(-48, -27),
+            new Point(0, 15),
+            new Point(37, -27)
+        };
+        System.out.println(hexMiddlePoints.length);
+        int num1 = 0;
+        while (num1 < 6) { // Replace 6 with your desired upper limit for num1
+            int num2 = 0;
+            while (num2 < 6) { // Replace 6 with your desired upper limit for num2
+                for (int i = 0; i < hexMiddlePoints.length - 1; i++) {
+                    if ((hexMiddlePoints[i].getX() + fPoints[num2].x) == (hexMiddlePoints[i + 1].getX() + fPoints[num1].x)) {
+                        Board.hexagons.get(i).vertices.get(num2).connectHexagon(i + 1, num1);
+                        System.out.println("hexagon: " + i + ", vertex: " + num2 + " -> hexagon: " + (i + 1) + ", vertex: " + num1);
+                    }
+                    //System.out.println("debug: " + (hexMiddlePoints[i].getX() + fPoints[num2].x) + " -> " + (hexMiddlePoints[i + 1].getX() + fPoints[num1].x)+"| hexagon: " + i + ", vertex: " + num2 + " -> hexagon: " + (i + 1) + ", vertex: " + num1);
+                }
+                num2++;
+            }
+            num1++;
+        }
+        
+        if(hexMiddlePoints[0].getX() + fPoints[5].x <= hexMiddlePoints[1].getX() + fPoints[2].x&&
+        hexMiddlePoints[0].getY() + fPoints[5].y >= hexMiddlePoints[1].getY() + fPoints[2].y){
+            System.out.println("find 1");
+        }
+   }
+   
+    
 
     // Improved method to draw hexagons with gradient fill and shadows
     private void drawBeautifulHexagon(Graphics2D g2d, int x, int y, int radius, Color color, String resource, int number) {

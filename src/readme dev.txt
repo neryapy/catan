@@ -1,1 +1,2 @@
-for add a resource for player you need to use player.resource.add
+for add a resource for player you need to use player.resource.add.
+algoritm for the hexagons overlapping problem: you have saved the middle of every hexagons(point) and now you cand check if I use formula for every vertex(the place with index) i can check if for example the vertex index 0 are on the same location of vertex 3 at another hexagon you check it for every vertex index and you calcul 684 vertices overlapping vertices, and you add calcul this only with range for hexagon possible. this not a optimised algoritm but work.

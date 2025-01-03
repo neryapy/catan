@@ -1,12 +1,12 @@
-
 import java.util.*;
-public class Board {
-    public static List<HexagonResource> hexagons;
-    private static Map<Integer, Set<Integer>> cities;
-    private int indexGener = 0;
+public class Board{
+    private static final long serialVersionUID = 1L; // Recommended for Serializable classes
+    private List<HexagonResource> hexagons;
+    private int indexGener = -1;
     private int[][] boardPattern;
-    public static devCards devCards;
-    public static ArrayList<Player> players = new ArrayList<Player>();
+    private devCards devCards;
+    public ArrayList<Player> players = new ArrayList<Player>();
+    private int sumDice=0;
     public Board() {
         boardPattern = new int[][]{
                 {0, 0, 1, 1, 1, 0, 0},
@@ -15,11 +15,9 @@ public class Board {
                 {0, 1, 1, 1, 1, 0, 0},
                 {0, 0, 1, 1, 1, 0, 0}};
         hexagons = new ArrayList<>();
-        cities = new HashMap<>();
 
         initializeBoard();
     }
-
     private void initializeBoard() {
         initPlayer(3);
         devCards=new devCards();
@@ -42,14 +40,14 @@ public class Board {
                 HexagonResource newHex = new HexagonResource(resourceType, number, indexGener);
                 hexagons.add(newHex);
         }}
-        printSortedHexagons();
+        //printSortedHexagons();
         players.get(0).setPlayerPlay(true);
     }
     private String getNextResourceType(List<String> resources) {
         return resources.isEmpty() ? "Unknown" : resources.remove(0);
     }
-    public static List<HexagonResource> getHexagons(){return hexagons;}
-    public static void exchangeResource(Player p1, Player p2, ArrayList<Resource> r1, ArrayList<Resource> r2){if(p1.getResources().containsAll(r1)&&p2.getResources().containsAll(r2)){
+    public List<HexagonResource> getHexagons(){return hexagons;}
+    public void exchangeResource(Player p1, Player p2, ArrayList<Resource> r1, ArrayList<Resource> r2){if(p1.getResources().containsAll(r1)&&p2.getResources().containsAll(r2)){
             p1.addResources(r2);
             p1.removeResource(r1);
             p2.addResources(r1);
@@ -61,7 +59,7 @@ public class Board {
     }
     private void initPlayer(int number){
         for(int i=0; i<number; i++){
-            players.add(new Player(i));
+            players.add(new Player(i, this));
         }
     }
     private int getNextNumber(List<Integer> numbers) {
@@ -72,11 +70,8 @@ public class Board {
                 .sorted(Comparator.comparingInt(HexagonResource::getIndex))
                 .forEach(hexagon -> System.out.println("Hexagon " + hexagon.getIndex() + ": Resource " + hexagon.getResourceType()));
     }
-    public static List<HexagonResource> getSortedHexagons() {
-        return hexagons;
-    }
-    public static ArrayList<Player> getplayers(){return players;}
-    public static void setPlayersPlay(int numberOfPlayer, boolean play){
+    public ArrayList<Player> getplayers(){return players;}
+    public void setPlayersPlay(int numberOfPlayer, boolean play){
         if(numberOfPlayer==players.size()){
             players.get(0).setPlayerPlay(true);
             players.get(players.size()).setPlayerPlay(false);
@@ -84,7 +79,94 @@ public class Board {
         players.get(numberOfPlayer).setPlayerPlay(play);
     }
     public void addResourceByplayer(int pi, String typeResouce){
-        
         players.get(pi).addResourcebytype(typeResouce);
+    }
+    public String exportGameState(){
+        String hexagonsState="{";
+        String playerState="{";
+        for (int i = 0; i < hexagons.size(); i++) {
+            hexagonsState+="hexagon:"+i+", "+"number:"+hexagons.get(i).getNumber()+", "+"Resource:"+hexagons.get(i).getResourceType();
+            for(int k=0; k<hexagons.get(i).getVertices().size(); k++)hexagonsState+=", vertex:"+k+", village:"+hexagons.get(i).vertices.get(k).getVillage()+", cities:"+k+", city:"+hexagons.get(i).vertices.get(k).getCity();
+            hexagonsState+="}";
+        }
+        for(int i=0; i<players.size(); i++){
+            playerState+="player:"+i+", allpoints:"+players.get(i).getAllpoints()+", devcards:"+players.get(i).devcradString()+", villages:"+players.get(i).villagesString()+",cities:"+players.get(i).CitiesString()+", roads:"+players.get(i).roadsString()+", resources:"+ players.get(i).resourcesString();
+        }
+        playerState+="player play:"+playerPlayNum()+", sumDice:"+sumDice+"}";
+        return hexagonsState+=playerState;
+    }
+    public void updateGameState(String gameState) {
+        // Reset the current board state
+        hexagons.clear();
+    
+        // Parse the gameState string
+        String[] parts = gameState.split("sumDice:");
+        if (parts.length < 2) {
+            System.out.println("Invalid game state format");
+            return;
+        }
+        int startIndex = gameState.indexOf("player play:") + "player play:".length();
+        String playerPlayValue = gameState.substring(startIndex).trim();
+        int commaIndex = playerPlayValue.indexOf(",");
+        String playerPlayValueWithoutComma = playerPlayValue.substring(0, commaIndex).trim();
+        int playerPlayIntValue = Integer.parseInt(playerPlayValueWithoutComma);
+        players.get(playerPlayIntValue-1).setPlayerPlay(true);
+        if(playerPlayIntValue==1)players.getLast().setPlayerPlay(false);
+        else players.get(playerPlayIntValue-2).setPlayerPlay(false);
+        
+        for (int i = 0; i < players.size(); i++) {System.out.println("player: "+i+"play: "+players.get(i).isPlayerPlay());}
+        System.out.println("player play Num: "+playerPlayNum());
+        String hexagonsPart = parts[0];
+        String sumDicePart = parts[1].replace("}", "").trim(); // Remove the trailing '}' and extra spaces
+        System.out.println(sumDicePart);
+        // Parse hexagons
+        String[] hexagonEntries = hexagonsPart.split("}");
+        for (String hexagonEntry : hexagonEntries) {
+            if (!hexagonEntry.contains("hexagon")) continue;
+    
+            // Extract hexagon details
+            String[] hexagonAttributes = hexagonEntry.split(", ");
+            String resourceType = null;
+            int number = 0, index = 0;
+    
+            for (String attribute : hexagonAttributes) {
+                if (attribute.startsWith("hexagon:")) {
+                    index = Integer.parseInt(attribute.split(":")[1]);
+                } else if (attribute.startsWith("Resource:")) {
+                    resourceType = attribute.split(":")[1];
+                } else if (attribute.startsWith("number:")) {
+                    number = Integer.parseInt(attribute.split(":")[1]);
+                }
+            }
+    
+            // Recreate the hexagon and add it to the board
+            if (resourceType != null) {
+                HexagonResource hexagon = new HexagonResource(resourceType, number, index);
+                hexagons.add(hexagon);
+            }
+        }
+    
+        // Update the sumDice value
+        try {
+            sumDice = Integer.parseInt(sumDicePart);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid sumDice value");
+        }
+    
+        System.out.println("Game state updated successfully!");
+    }    
+    
+    public void removedevCards(int i){devCards.removeDevCardByIndex(i);}
+    public devCards getDevCards(){return devCards;}
+    public ArrayList<Player> getPlayers(){
+        return players;
+    }
+    public List<HexagonResource> getHexagonResources(){return hexagons;}
+    public void setSumDice(int x){sumDice=x;}
+    public void addResourceByPlayer(int ip, String type){players.get(ip).resources.add(new Resource(type));}
+    public int getSumDice(){return sumDice;}
+    public int playerPlayNum() {
+        for (int i = 0; i < players.size(); i++) {if (players.get(i).isPlayerPlay()) {return i+1;}}
+        return -1;
     }
 }

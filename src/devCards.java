@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 public class devCards {
@@ -13,6 +12,7 @@ public class devCards {
         Collections.shuffle(this.cards);
     }
     public void removeDevCard(devCard d){cards.remove(d);}
+    public void removeDevCardByIndex(int x){cards.remove(x);}
     public int size(){return cards.size();}
     public devCard randomCard(){return cards.getFirst();}
 }

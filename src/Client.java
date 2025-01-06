@@ -6,11 +6,11 @@ import java.net.SocketException;
 public class Client {
     private int port;
     private InetAddress ipToListen;
-    private Ui ui = new Ui(new Board());
+    private Ui ui = new Ui(new Board(3));
     private volatile boolean running = true; // Flag to control the loop
 
     public Client(int pt, String ipToListenStr) {
-        Board b = new Board();
+        Board b = new Board(3);
         port = pt;
 
         try {

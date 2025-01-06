@@ -7,7 +7,7 @@ public class Board{
     private devCards devCards;
     public ArrayList<Player> players = new ArrayList<Player>();
     private int sumDice=0;
-    public Board() {
+    public Board(int numberOfPlayers) {
         boardPattern = new int[][]{
                 {0, 0, 1, 1, 1, 0, 0},
                 {0, 1, 1, 1, 1, 0, 0},
@@ -16,10 +16,10 @@ public class Board{
                 {0, 0, 1, 1, 1, 0, 0}};
         hexagons = new ArrayList<>();
 
-        initializeBoard();
+        initializeBoard(numberOfPlayers);
     }
-    private void initializeBoard() {
-        initPlayer(3);
+    private void initializeBoard(int nop) {
+        initPlayer(nop);
         devCards=new devCards();
         Map<String, Integer> resourceCounts = new HashMap<>();
         resourceCounts.put("lumber", 4);

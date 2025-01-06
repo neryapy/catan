@@ -3,14 +3,15 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 public class host {
-    private Board b = new Board();
-    private Ui ui = new Ui(b);
+    private Board b;
+    private Ui ui;
     private volatile boolean running = true; // Flag to control the loop
 
     public host(String[] hostAddr, int pt) {
         String[] hostAddresses = hostAddr;
         int port = pt;
-
+        b = new Board(3);
+        ui = new Ui(b);
         // Start the loop in a separate thread
         new Thread(() -> {
             try (DatagramSocket socket = new DatagramSocket()) {

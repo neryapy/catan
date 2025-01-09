@@ -24,7 +24,7 @@ public class Client {
         // Start the listening loop in a separate thread
         new Thread(() -> {
             try (DatagramSocket socket = new DatagramSocket(port, ipToListen)) {
-                byte[] buffer = new byte[6329];
+                byte[] buffer = new byte[6394];
                 System.out.println("Client is listening on " + ipToListen.getHostAddress() + ":" + port);
 
                 while (running) {
@@ -34,9 +34,8 @@ public class Client {
 
                         String received = new String(packet.getData(), 0, packet.getLength());
                         b.updateGameState(received);
-                        System.out.println("Sum dice: " + b.getSumDice());
                         ui.updateAll(b);
-                        System.out.println("------------------------------------------------------------------------------------------------------------------");
+                        //System.out.println("------------------------------------------------------------------------------------------------------------------");
                     } catch (Exception e) {
                         if (running) { // Ignore exceptions if we're stopping
                             e.printStackTrace();

@@ -14,6 +14,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -312,7 +313,6 @@ public class Ui extends JPanel {
                         }
                     }
                 }
-
                 break;  // Stop after processing the clicked vertex
             }
         }
@@ -432,13 +432,20 @@ public class Ui extends JPanel {
         villageButton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
+                //ArrayList<Resource> r=new ArrayList<>();
+                //r.add(new Resource("grain"));
+                //r.add(new Resource("wool"));
+                //r.add(new Resource("lumber"));
+                //r.add(new Resource("brick"));
+                //board.players.get(playerPlayNum(board.getPlayers())).addResources(r);
                 if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("grain"))){colorResourceAsRed(resourceCircles.get(0));}
                 if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("brick"))){colorResourceAsRed(resourceCircles.get(3));}
                 if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("lumber"))){colorResourceAsRed(resourceCircles.get(4));}
                 if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("wool"))){colorResourceAsRed(resourceCircles.get(1));}
-                
-                colorAllVertices();  // Color all vertices when pressed
-
+                else{
+                    board.players.get(playerPlayNum(board.getPlayers())).setBuildVillage(true);
+                    colorAllVertices();  // Color all vertices when pressed
+                }
             }
         });
         rightPanel.add(resourcePanel);

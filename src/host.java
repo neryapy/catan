@@ -10,7 +10,8 @@ public class host {
     public host(String[] hostAddr, int pt) {
         String[] hostAddresses = hostAddr;
         int port = pt;
-        b = new Board(3);
+        b = new Board(hostAddresses.length);
+        b.setIps(hostAddresses);
         ui = new Ui(b);
         // Start the loop in a separate thread
         new Thread(() -> {

@@ -41,10 +41,16 @@ public class Board{
                 hexagons.add(newHex);
         }}
         //printSortedHexagons();
-        players.get(0).setPlayerPlay(true);
+        
+        startGame();
     }
     private String getNextResourceType(List<String> resources) {
         return resources.isEmpty() ? "Unknown" : resources.remove(0);
+    }
+    private void startGame() {
+        players.get(0).setPlayerPlay(true);
+        
+        for(int i=0; i<players.size(); i++)System.out.println("player "+i+" play "+players.get(i).isPlayerPlay());
     }
     public List<HexagonResource> getHexagons(){return hexagons;}
     public void exchangeResource(Player p1, Player p2, ArrayList<Resource> r1, ArrayList<Resource> r2){if(p1.getResources().containsAll(r1)&&p2.getResources().containsAll(r2)){
@@ -114,8 +120,8 @@ public class Board{
         if(playerPlayIntValue==1)players.getLast().setPlayerPlay(false);
         else players.get(playerPlayIntValue-2).setPlayerPlay(false);
         
-        for (int i = 0; i < players.size(); i++) {System.out.println("player: "+i+"play: "+players.get(i).isPlayerPlay());}
-        System.out.println("player play Num: "+playerPlayNum());
+        //for (int i = 0; i < players.size(); i++) {System.out.println("player: "+i+"play: "+players.get(i).isPlayerPlay());}
+        //System.out.println("player play Num: "+playerPlayNum());
         String hexagonsPart = parts[0];
         String sumDicePart = parts[1].replace("}", "").trim(); // Remove the trailing '}' and extra spaces
         System.out.println(sumDicePart);
@@ -153,9 +159,14 @@ public class Board{
             System.out.println("Invalid sumDice value");
         }
     
-        System.out.println("Game state updated successfully!");
+        //System.out.println("Game state updated successfully!");
     }    
-    
+    public void setIps(String[] ips){
+        for(int i=0; i<players.size(); i++){
+            players.get(i).setIp(ips[i]);
+            System.out.println("player "+i+" seted "+players.get(i).getIp());
+        }
+    }
     public void removedevCards(int i){devCards.removeDevCardByIndex(i);}
     public devCards getDevCards(){return devCards;}
     public ArrayList<Player> getPlayers(){

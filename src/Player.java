@@ -9,7 +9,9 @@ public class Player {
     public ArrayList<City> Cities;
     public ArrayList<Road> roads;
     public ArrayList<Resource> resources=new ArrayList<>();
+    private String ip;
     private Board Board;
+    private boolean BuildVillage=false;
     public Player(int number, Board h) {
         this.Board=h;
         this.number = number;
@@ -17,6 +19,12 @@ public class Player {
         this.villages = new ArrayList<>(); // Initialize the ArrayList
         this.Cities=new ArrayList<>();
         this.roads=new ArrayList<>();
+    }
+    public void setAllPoints(int i){
+        allPoints=i;
+    }
+    public void setBuildVillage(boolean b){
+        BuildVillage=b;
     }
     public void buyDevCard(){
         ArrayList<Resource> requirements=new ArrayList<>();
@@ -46,6 +54,8 @@ public class Player {
             if(d.getType()=="road building")useRoadBuilding(new Road(0,0),new Road(1,1));
         }
     }
+    public String getIp(){return ip;}
+    public void setIp(String ip){this.ip=ip;}
     private void useRoadBuilding(Road r1, Road r2){
         if(playerDevCards.contains(new devCard("road building"))&&false==playerDevCards.get(playerDevCards.indexOf(new devCard("road building"))).getUsed()){
             addRoad(r1);

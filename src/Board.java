@@ -49,8 +49,8 @@ public class Board{
     }
     private void startGame() {
         players.get(0).setPlayerPlay(true);
-        
         for(int i=0; i<players.size(); i++)System.out.println("player "+i+" play "+players.get(i).isPlayerPlay());
+        
     }
     public List<HexagonResource> getHexagons(){return hexagons;}
     public void exchangeResource(Player p1, Player p2, ArrayList<Resource> r1, ArrayList<Resource> r2){if(p1.getResources().containsAll(r1)&&p2.getResources().containsAll(r2)){

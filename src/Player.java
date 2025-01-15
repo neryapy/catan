@@ -12,6 +12,7 @@ public class Player {
     private String ip;
     private Board Board;
     private boolean BuildVillage=false;
+    private boolean diceturned=false;
     public Player(int number, Board h) {
         this.Board=h;
         this.number = number;
@@ -25,6 +26,12 @@ public class Player {
     }
     public void setBuildVillage(boolean b){
         BuildVillage=b;
+    }
+    public boolean getDiceTurned(){
+        return diceturned;
+    }
+    public void setDiceTurned(boolean b){
+        diceturned=b;
     }
     public void buyDevCard(){
         ArrayList<Resource> requirements=new ArrayList<>();

@@ -1,18 +1,19 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.NetworkInterface;
+import java.nio.ByteBuffer;
+import java.util.Enumeration;
 
 public class Client {
     private int port;
     private InetAddress ipToListen;
     private Ui ui = new Ui(new Board(3));
-    private volatile boolean running = true; // Flag to control the loop
+    private volatile boolean running = true;
 
     public Client(int pt, String ipToListenStr) {
         Board b = new Board(3);
         port = pt;
-
         try {
             ipToListen = InetAddress.getByName(ipToListenStr);
         } catch (Exception e) {
@@ -20,38 +21,54 @@ public class Client {
             e.printStackTrace();
             return;
         }
-
-        // Start the listening loop in a separate thread
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = interfaces.nextElement();
+                Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+                while (addresses.hasMoreElements()) {
+                    InetAddress inetAddress = addresses.nextElement();
+                    if (!inetAddress.isLoopbackAddress() && inetAddress.isSiteLocalAddress()) {
+                        ui.setOwnIp(inetAddress.getHostAddress());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
         new Thread(() -> {
             try (DatagramSocket socket = new DatagramSocket(port, ipToListen)) {
-                byte[] buffer = new byte[6394];
                 System.out.println("Client is listening on " + ipToListen.getHostAddress() + ":" + port);
 
                 while (running) {
                     try {
-                        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-                        socket.receive(packet);
+                        // Read size header
+                        byte[] sizeHeader = new byte[4];
+                        DatagramPacket sizePacket = new DatagramPacket(sizeHeader, sizeHeader.length);
+                        socket.receive(sizePacket);
+                        int dataSize = ByteBuffer.wrap(sizePacket.getData()).getInt();
 
-                        String received = new String(packet.getData(), 0, packet.getLength());
+                        // Read actual data
+                        byte[] dataBuffer = new byte[dataSize];
+                        DatagramPacket dataPacket = new DatagramPacket(dataBuffer, dataBuffer.length);
+                        socket.receive(dataPacket);
+
+                        String received = new String(dataPacket.getData(), 0, dataPacket.getLength());
                         b.updateGameState(received);
                         ui.updateAll(b);
-                        //System.out.println("------------------------------------------------------------------------------------------------------------------");
                     } catch (Exception e) {
-                        if (running) { // Ignore exceptions if we're stopping
+                        if (running) {
                             e.printStackTrace();
                         }
                     }
                 }
-            } catch (SocketException e) {
-                System.err.println("Socket could not be created on " + ipToListen.getHostAddress() + ":" + port);
-                e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }).start();
     }
 
-    // Stop the loop gracefully
     public void stop() {
         running = false;
     }

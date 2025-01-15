@@ -14,7 +14,6 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,6 +43,7 @@ public class Ui extends JPanel {
     private JLabel cubesJLabel = new JLabel();
     private JLabel playerPlayLabel;
     private JFrame frame = new JFrame("CATAN");
+    private String ownIp="";
     public Ui(Board board) {
         if(board.getHexagonResources()!=null){
             this.board=board;
@@ -53,7 +53,9 @@ public class Ui extends JPanel {
             System.out.println("the ui was not created becasue");
         }
     }
-
+    public void setOwnIp(String ip){
+        this.ownIp=ip;
+    }
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setPreferredSize(new Dimension(120, 45));
@@ -266,6 +268,7 @@ public class Ui extends JPanel {
                 } else {
                     coloredVertices.add(new Point(px, py)); // Store green vertex
                 }
+                board.players.get(playerPlayNum(board.players)).villages.add(new Village(hexIndex, vertexIndex, playerPlayNum(board.getPlayers())));
             }
         }
 
@@ -432,6 +435,12 @@ public class Ui extends JPanel {
         villageButton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
+                if(sumDice==0){
+                    board.players.get(playerPlayNum(board.getPlayers())).setBuildVillage(true);
+                    colorAllVertices();
+                    sumDice=-1;
+                }
+                if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp){
                 //ArrayList<Resource> r=new ArrayList<>();
                 //r.add(new Resource("grain"));
                 //r.add(new Resource("wool"));
@@ -443,22 +452,27 @@ public class Ui extends JPanel {
                 if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("lumber"))){colorResourceAsRed(resourceCircles.get(4));}
                 if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("wool"))){colorResourceAsRed(resourceCircles.get(1));}
                 else{
+                    
                     board.players.get(playerPlayNum(board.getPlayers())).setBuildVillage(true);
                     colorAllVertices();  // Color all vertices when pressed
                 }
             }
+        }
         });
         rightPanel.add(resourcePanel);
         roadButton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
+                if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp){
                 if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("brick"))){colorResourceAsRed(resourceCircles.get(3));}
                 if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("lumber"))){colorResourceAsRed(resourceCircles.get(4));}
+                }
             }
         });
         cityButton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
+                if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp){
                 // Retrieve the current player's resources
                 ArrayList<Resource> resources = board.getPlayers().get(playerPlayNum(board.getPlayers())).resources;
 
@@ -472,6 +486,7 @@ public class Ui extends JPanel {
                 if (oreCount < 3) {
                     colorResourceAsRed(resourceCircles.get(2)); // Assuming ore circle is at index 2
                 }
+            }
             }
         });
         buyDevcardButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -497,19 +512,22 @@ public class Ui extends JPanel {
         endTurnButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(playerPlayNum(board.getPlayers())+1==board.getPlayers().size()){
-                    board.players.get(board.getPlayers().size()-1).setPlayerPlay(false);
-                    board.players.get(0).setPlayerPlay(true);
+                    if(board.getplayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp){
+                    
+                    if(playerPlayNum(board.getPlayers())+1==board.getPlayers().size()){
+                        board.players.get(board.getPlayers().size()-1).setPlayerPlay(false);
+                        board.players.get(0).setPlayerPlay(true);
+                    }
+                    else {
+                        board.setPlayersPlay(playerPlayNum(board.getPlayers()) + 1, true);
+                        board.setPlayersPlay(playerPlayNum(board.getPlayers()), false);
+                    }
+                    System.out.println("Turn Ended "+(playerPlayNum(board.getPlayers())+1));
+                    playerPlayLabel.setText("Player play: " + (playerPlayNum(board.getPlayers())+1));
+                    System.out.println("Player play by ui: " + (playerPlayNum(board.getPlayers())+1));
+                    board.players.get(playerPlayNum(board.getPlayers())).setDiceTurned(false);
+                    repaint();
                 }
-                else {
-                    board.setPlayersPlay(playerPlayNum(board.getPlayers()) + 1, true);
-                    board.setPlayersPlay(playerPlayNum(board.getPlayers()), false);
-                }
-                System.out.println("Turn Ended "+(playerPlayNum(board.getPlayers())+1));
-                playerPlayLabel.setText("Player play: " + (playerPlayNum(board.getPlayers())+1));
-                System.out.println("Player play by ui: " + (playerPlayNum(board.getPlayers())+1));
-                repaint();
-                
             }
         });
 //
@@ -529,12 +547,16 @@ public class Ui extends JPanel {
         rollDie.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(board.getplayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp&&board.players.get(playerPlayNum(board.players)).getDiceTurned()==false){
+
                 sumDice=randomDie();
                 board.setSumDice(sumDice);
                 cubesJLabel.setText("the sum of the dice:"+sumDice);
                 System.out.println("the sum of the dice: "+sumDice);
                 rightPanel.repaint();
+                board.players.get(playerPlayNum(board.getPlayers())).setDiceTurned(true);
             }
+        }
         });
 //
 // Add a mouse listener to detect when a vertex is clicked to clear the color
@@ -660,7 +682,6 @@ public class Ui extends JPanel {
         frame.setSize(1000, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-        
     }
     public void updateAll(Board board){
         this.board=board;

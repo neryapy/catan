@@ -14,7 +14,6 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,6 +43,8 @@ public class Ui extends JPanel {
     private JLabel cubesJLabel = new JLabel();
     private JLabel playerPlayLabel;
     private JFrame frame = new JFrame("CATAN");
+    private String ownIp="";
+    private Village villageclicked;
     public Ui(Board board) {
         if(board.getHexagonResources()!=null){
             this.board=board;
@@ -53,7 +54,9 @@ public class Ui extends JPanel {
             System.out.println("the ui was not created becasue");
         }
     }
-
+    public void setOwnIp(String ip){
+        this.ownIp=ip;
+    }
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setPreferredSize(new Dimension(120, 45));
@@ -63,28 +66,23 @@ public class Ui extends JPanel {
         button.setFont(new Font("Arial", Font.BOLD, 16));
         button.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         // Set rounded corners and shadow effect
         button.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(35, 125, 235), 2), // Outer border for button outline
                 BorderFactory.createEmptyBorder(10, 20, 10, 20))); // Inner padding
-
         // Add hover effect
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(new Color(35, 125, 235));
                 button.setForeground(new Color(220, 220, 255));
             }
-
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setBackground(new Color(45, 145, 255));
                 button.setForeground(Color.WHITE);
             }
         });
-
         return button;
     }
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -244,10 +242,11 @@ public class Ui extends JPanel {
     }
 
     private void colorAllVertices() {
+        int hexIndex=0;
         coloredVertices.clear(); // Clear previous vertices if any
 
         // Loop through each hexagon and its vertices
-        for (int hexIndex = 0; hexIndex < board.getHexagons().size(); hexIndex++) {
+        for (hexIndex = 0; hexIndex < board.getHexagons().size(); hexIndex++) {
             Point hexCenter = centerPoints.get(hexIndex); // Get the center point of the hexagon
 
             // Get the vertices of the current hexagon
@@ -271,8 +270,16 @@ public class Ui extends JPanel {
 
         repaint(); // Trigger a repaint to actually draw the colored vertices
     }
-
     private void clearClickedVertex(Point clickPoint) {
+        int hexClicked = -1;
+        int vertexClicked = -1;
+        System.out.println("estimated: "+clickPoint.y+" exact: "+(hexMiddlePoints[0].y-50));
+        //v5=(mx+50), (my-25)
+        //v4=(mx), (my-50)
+        //v3=(mx-50), (my-25)
+        //v2=(mx-50), (my+25)
+        //v1=(mx), (my+50)
+        //v0=(mx+50), (my+25)
         // Iterate through the list of colored vertices
         var iterator = coloredVertices.iterator();
         Point clickedVertex = null; // Variable to store the clicked vertex
@@ -313,8 +320,11 @@ public class Ui extends JPanel {
                         }
                     }
                 }
+
                 break;  // Stop after processing the clicked vertex
             }
+
+
         }
 
         // Now, we clear the color of all vertices except those with village == true
@@ -338,10 +348,36 @@ public class Ui extends JPanel {
                 }
             }
         }
-
+        for(int i=0; i<board.getHexagons().size(); i++){
+            if(hexMiddlePoints[i].x-55<=clickPoint.x && hexMiddlePoints[i].x+55>=clickPoint.x&&hexMiddlePoints[i].y-55<=clickPoint.y&&hexMiddlePoints[i].y+55>=clickPoint.y){
+                hexClicked=i;
+            }
+            System.out.println("hex clicked: "+hexClicked);
+            
+        }
+        if(hexMiddlePoints[hexClicked].x+60>=clickPoint.x&&hexMiddlePoints[hexClicked].x+40<=clickPoint.x&&hexMiddlePoints[hexClicked].y+35>=clickPoint.y&&hexMiddlePoints[hexClicked].y+15<=clickPoint.y){
+            vertexClicked=0;
+            System.out.println("vertex 0");}
+        if(hexMiddlePoints[hexClicked].x+10>=clickPoint.x&&hexMiddlePoints[hexClicked].x-10<=clickPoint.x&&hexMiddlePoints[hexClicked].y+60>=clickPoint.y&&hexMiddlePoints[hexClicked].y+40<=clickPoint.y){
+            vertexClicked=1;
+            System.out.println("vertex 1");}
+        if(hexMiddlePoints[hexClicked].x-40>=clickPoint.x&&hexMiddlePoints[hexClicked].x-60<=clickPoint.x&&hexMiddlePoints[hexClicked].y+35>=clickPoint.y&&hexMiddlePoints[hexClicked].y+15<=clickPoint.y){
+            vertexClicked=2;
+            System.out.println("vertex 2");}
+        if(hexMiddlePoints[hexClicked].x-40>=clickPoint.x&&hexMiddlePoints[hexClicked].x-60<=clickPoint.x&&hexMiddlePoints[hexClicked].y-15>=clickPoint.y&&hexMiddlePoints[hexClicked].y-35<=clickPoint.y){
+            vertexClicked=3;
+            System.out.println("vertex 3");}
+        if(hexMiddlePoints[hexClicked].x+10>=clickPoint.x&&hexMiddlePoints[hexClicked].x-10<=clickPoint.x&&hexMiddlePoints[hexClicked].y-40>=clickPoint.y&&hexMiddlePoints[hexClicked].y-60<=clickPoint.y){
+            vertexClicked=4;
+            System.out.println("vertex 4");}
+        if(hexMiddlePoints[hexClicked].x+60>=clickPoint.x&&hexMiddlePoints[hexClicked].x+40<=clickPoint.x&&hexMiddlePoints[hexClicked].y-15>=clickPoint.y&&hexMiddlePoints[hexClicked].y-35<=clickPoint.y){
+            vertexClicked=5;
+            System.out.println("vertex 5");}
+        System.out.println("click point: x:"+clickPoint.x+" y:"+clickPoint.y+"middle hex: x:"+hexMiddlePoints[hexClicked].x+" y:"+hexMiddlePoints[hexClicked].y);
+        System.out.println("hex clicked: "+hexClicked+" vertex clicked: "+vertexClicked);
         repaint(); // Trigger repaint to update the board after the changes
+        villageclicked=new Village(hexClicked, vertexClicked,playerPlayNum(board.getPlayers()));
     }
-
     private int playerPlayNum(ArrayList<Player> getPlayers) {
         for (int i = 0; i < getPlayers.size(); i++) {if (getPlayers.get(i).isPlayerPlay()) {return i;}}
         return -1;
@@ -432,33 +468,52 @@ public class Ui extends JPanel {
         villageButton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
-                //ArrayList<Resource> r=new ArrayList<>();
-                //r.add(new Resource("grain"));
-                //r.add(new Resource("wool"));
-                //r.add(new Resource("lumber"));
-                //r.add(new Resource("brick"));
-                //board.players.get(playerPlayNum(board.getPlayers())).addResources(r);
-                if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("grain"))){colorResourceAsRed(resourceCircles.get(0));}
-                if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("brick"))){colorResourceAsRed(resourceCircles.get(3));}
-                if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("lumber"))){colorResourceAsRed(resourceCircles.get(4));}
-                if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("wool"))){colorResourceAsRed(resourceCircles.get(1));}
-                else{
+                if(sumDice==0){
                     board.players.get(playerPlayNum(board.getPlayers())).setBuildVillage(true);
-                    colorAllVertices();  // Color all vertices when pressed
+                    colorAllVertices();
+                    sumDice=-1;
+                }
+                else{
+                    if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp){
+                    //ArrayList<Resource> r=new ArrayList<>();
+                    //r.add(new Resource("grain"));
+                    //r.add(new Resource("wool"));
+                    //r.add(new Resource("lumber"));
+                    //r.add(new Resource("brick"));
+                    //board.players.get(playerPlayNum(board.getPlayers())).addResources(r);
+                    if(board.getPlayers().get(playerPlayNum(board.getPlayers())).villages.size()<2){
+                        board.players.get(playerPlayNum(board.getPlayers())).setBuildVillage(true);
+                        board.players.get(playerPlayNum(board.getPlayers())).addVillage(villageclicked);
+                        System.out.println("-----------------------------player: "+playerPlayNum(board.getPlayers())+" villages: "+board.players.get(playerPlayNum(board.getPlayers())).villages.size());
+                    }
+                    if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("grain"))){colorResourceAsRed(resourceCircles.get(0));}
+                    if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("brick"))){colorResourceAsRed(resourceCircles.get(3));}
+                    if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("lumber"))){colorResourceAsRed(resourceCircles.get(4));}
+                    if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("wool"))){colorResourceAsRed(resourceCircles.get(1));}
+                    else{
+
+                        board.players.get(playerPlayNum(board.getPlayers())).setBuildVillage(true);
+                        if(villageclicked!=null) board.players.get(playerPlayNum(board.getPlayers())).addVillage(villageclicked);
+                        System.out.println("player: "+playerPlayNum(board.getPlayers())+" villages: "+board.players.get(playerPlayNum(board.getPlayers())).villages.size());
+                    }
                 }
             }
+        }
         });
         rightPanel.add(resourcePanel);
         roadButton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
+                if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp){
                 if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("brick"))){colorResourceAsRed(resourceCircles.get(3));}
                 if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("lumber"))){colorResourceAsRed(resourceCircles.get(4));}
+                }
             }
         });
         cityButton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
+                if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp){
                 // Retrieve the current player's resources
                 ArrayList<Resource> resources = board.getPlayers().get(playerPlayNum(board.getPlayers())).resources;
 
@@ -472,6 +527,7 @@ public class Ui extends JPanel {
                 if (oreCount < 3) {
                     colorResourceAsRed(resourceCircles.get(2)); // Assuming ore circle is at index 2
                 }
+            }
             }
         });
         buyDevcardButton.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -497,19 +553,22 @@ public class Ui extends JPanel {
         endTurnButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(playerPlayNum(board.getPlayers())+1==board.getPlayers().size()){
-                    board.players.get(board.getPlayers().size()-1).setPlayerPlay(false);
-                    board.players.get(0).setPlayerPlay(true);
+                    if(board.getplayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp){
+                    
+                    if(playerPlayNum(board.getPlayers())+1==board.getPlayers().size()){
+                        board.players.get(board.getPlayers().size()-1).setPlayerPlay(false);
+                        board.players.get(0).setPlayerPlay(true);
+                    }
+                    else {
+                        board.setPlayersPlay(playerPlayNum(board.getPlayers()) + 1, true);
+                        board.setPlayersPlay(playerPlayNum(board.getPlayers()), false);
+                    }
+                    System.out.println("Turn Ended "+(playerPlayNum(board.getPlayers())+1));
+                    playerPlayLabel.setText("Player play: " + (playerPlayNum(board.getPlayers())+1));
+                    System.out.println("Player play by ui: " + (playerPlayNum(board.getPlayers())+1));
+                    board.players.get(playerPlayNum(board.getPlayers())).setDiceTurned(false);
+                    repaint();
                 }
-                else {
-                    board.setPlayersPlay(playerPlayNum(board.getPlayers()) + 1, true);
-                    board.setPlayersPlay(playerPlayNum(board.getPlayers()), false);
-                }
-                System.out.println("Turn Ended "+(playerPlayNum(board.getPlayers())+1));
-                playerPlayLabel.setText("Player play: " + (playerPlayNum(board.getPlayers())+1));
-                System.out.println("Player play by ui: " + (playerPlayNum(board.getPlayers())+1));
-                repaint();
-                
             }
         });
 //
@@ -529,12 +588,16 @@ public class Ui extends JPanel {
         rollDie.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(board.getplayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp&&board.players.get(playerPlayNum(board.players)).getDiceTurned()==false){
+
                 sumDice=randomDie();
                 board.setSumDice(sumDice);
                 cubesJLabel.setText("the sum of the dice:"+sumDice);
                 System.out.println("the sum of the dice: "+sumDice);
                 rightPanel.repaint();
+                board.players.get(playerPlayNum(board.getPlayers())).setDiceTurned(true);
             }
+        }
         });
 //
 // Add a mouse listener to detect when a vertex is clicked to clear the color
@@ -637,8 +700,6 @@ public class Ui extends JPanel {
             resourcePanel.add(circlePanel);
             repaint();
         }
-
-
         rightPanel.add(resourcePanel);
 
         // Add action listener for End Turn button
@@ -660,7 +721,6 @@ public class Ui extends JPanel {
         frame.setSize(1000, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-        
     }
     public void updateAll(Board board){
         this.board=board;

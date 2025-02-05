@@ -1,9 +1,10 @@
 import java.awt.*;
+import java.util.ArrayList;
 import javax.swing.*;
 
 public class PartyManager {
     private JFrame frame = new JFrame("Party Manager");
-    private String[] clientAddress;
+    private ArrayList<String> clientAddress = new ArrayList<>();
     private int clientPort;
 
     public PartyManager() {
@@ -16,16 +17,12 @@ public class PartyManager {
         choicePanel.setSize(400, 300);
 
         JButton hostButton = createStyledButton("Host the game");
-        hostButton.addActionListener(e -> {
-            showHostPanel();
-        });
+        hostButton.addActionListener(e -> showHostPanel());
         hostButton.setSize(160, 40);
         hostButton.setLocation(20, 100);
 
         JButton joinButton = createStyledButton("Join the game");
-        joinButton.addActionListener(e -> {
-            showClientPanel();
-        });
+        joinButton.addActionListener(e -> showClientPanel());
         joinButton.setSize(160, 40);
         joinButton.setLocation(200, 100);
 
@@ -34,6 +31,7 @@ public class PartyManager {
 
         frame.add(choicePanel);
     }
+
     private void showHostPanel() {
         JPanel hostPanel = new JPanel();
         hostPanel.setLayout(new BoxLayout(hostPanel, BoxLayout.Y_AXIS));
@@ -53,7 +51,10 @@ public class PartyManager {
 
         JButton hostGameButton = createStyledButton("Host Game");
         hostGameButton.addActionListener(e -> {
-            new host(clientAddress, clientPort);
+            for (int i = 0; i < clientAddress.size(); i++) {
+                System.out.println(clientAddress.size() + " | ip: " + clientAddress.get(i) + ":" + clientPort);
+            }
+            new host(clientAddress.toArray(new String[0]), clientPort);
             System.out.println("Game hosted.");
         });
 
@@ -68,6 +69,7 @@ public class PartyManager {
         frame.revalidate();
         frame.repaint();
     }
+
     private void showClientPanel() {
         JPanel clientPanel = new JPanel();
         clientPanel.setLayout(new BoxLayout(clientPanel, BoxLayout.Y_AXIS));
@@ -83,10 +85,11 @@ public class PartyManager {
 
         JButton connectButton = createStyledButton("Connect");
         connectButton.addActionListener(e -> {
-            clientAddress = new String[]{ipField.getText()};
+            clientAddress.clear();
+            clientAddress.add(ipField.getText());
             clientPort = Integer.parseInt(portField.getText());
             new Client(clientPort, ipField.getText());
-            System.out.println("Connected to IP: " + clientAddress[0] + ", Port: " + clientPort);
+            System.out.println("Connected to IP: " + clientAddress.get(0) + ", Port: " + clientPort);
         });
 
         clientPanel.add(ipLabel);
@@ -118,7 +121,7 @@ public class PartyManager {
 
         JButton finishButton = createStyledButton("Finish");
         finishButton.addActionListener(e -> {
-            clientAddress = new String[]{ipField.getText()};
+            clientAddress.add(ipField.getText());
             clientPort = Integer.parseInt(portField.getText());
             System.out.println("Client added.");
             finishButton.setEnabled(false);

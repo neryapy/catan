@@ -49,8 +49,8 @@ public class Board{
     }
     private void startGame() {
         players.get(0).setPlayerPlay(true);
-        
         for(int i=0; i<players.size(); i++)System.out.println("player "+i+" play "+players.get(i).isPlayerPlay());
+        
     }
     public List<HexagonResource> getHexagons(){return hexagons;}
     public void exchangeResource(Player p1, Player p2, ArrayList<Resource> r1, ArrayList<Resource> r2){if(p1.getResources().containsAll(r1)&&p2.getResources().containsAll(r2)){
@@ -96,12 +96,16 @@ public class Board{
             hexagonsState+="}";
         }
         for(int i=0; i<players.size(); i++){
+            System.out.println("the player:"+i+" | village size:"+players.get(i).villages.size());
             playerState+="player:"+i+", allpoints:"+players.get(i).getAllpoints()+", devcards:"+players.get(i).devcradString()+", villages:"+players.get(i).villagesString()+",cities:"+players.get(i).CitiesString()+", roads:"+players.get(i).roadsString()+", resources:"+ players.get(i).resourcesString();
         }
         playerState+="player play:"+playerPlayNum()+", sumDice:"+sumDice+"}";
         return hexagonsState+=playerState;
     }
     public void updateGameState(String gameState) {
+        
+        List<Boolean> villageStates = new ArrayList<>();
+        List<Boolean> cityStates = new ArrayList<>();
         // Reset the current board state
         hexagons.clear();
     
@@ -116,15 +120,13 @@ public class Board{
         int commaIndex = playerPlayValue.indexOf(",");
         String playerPlayValueWithoutComma = playerPlayValue.substring(0, commaIndex).trim();
         int playerPlayIntValue = Integer.parseInt(playerPlayValueWithoutComma);
-        players.get(playerPlayIntValue-1).setPlayerPlay(true);
-        if(playerPlayIntValue==1)players.getLast().setPlayerPlay(false);
-        else players.get(playerPlayIntValue-2).setPlayerPlay(false);
-        
-        //for (int i = 0; i < players.size(); i++) {System.out.println("player: "+i+"play: "+players.get(i).isPlayerPlay());}
-        //System.out.println("player play Num: "+playerPlayNum());
+        players.get(playerPlayIntValue - 1).setPlayerPlay(true);
+        if (playerPlayIntValue == 1) players.getLast().setPlayerPlay(false);
+        else players.get(playerPlayIntValue - 2).setPlayerPlay(false);
+    
         String hexagonsPart = parts[0];
         String sumDicePart = parts[1].replace("}", "").trim(); // Remove the trailing '}' and extra spaces
-        System.out.println(sumDicePart);
+    
         // Parse hexagons
         String[] hexagonEntries = hexagonsPart.split("}");
         for (String hexagonEntry : hexagonEntries) {
@@ -142,25 +144,48 @@ public class Board{
                     resourceType = attribute.split(":")[1];
                 } else if (attribute.startsWith("number:")) {
                     number = Integer.parseInt(attribute.split(":")[1]);
+                } else if (attribute.startsWith("village:")) {
+                    villageStates.add(Boolean.parseBoolean(attribute.split(":")[1]));
+                } else if (attribute.startsWith("city:")) {
+                    cityStates.add(Boolean.parseBoolean(attribute.split(":")[1]));
                 }
             }
-    
             // Recreate the hexagon and add it to the board
             if (resourceType != null) {
                 HexagonResource hexagon = new HexagonResource(resourceType, number, index);
+    
+                // Assign villages and cities to vertices
+                for (int i = 0; i < hexagon.getVertices().size(); i++) {
+                    if (i < villageStates.size()) {
+                        hexagon.getVertices().get(i).setVillage(villageStates.get(i));
+                    }
+                    if (i < cityStates.size()) {
+                        hexagon.getVertices().get(i).setCity(cityStates.get(i));
+                    }
+                }
+    
                 hexagons.add(hexagon);
             }
+            for(int i=0; i<villageStates.size(); i++)System.out.println("village: "+i+" is "+villageStates.get(i));
         }
     
+        // update village and city
+        for(int i=0; i<hexagons.size(); i++){
+            for(int v=0; v<hexagons.get(i).vertices.size(); v++){
+                hexagons.get(i).vertices.get(v).setVillage(villageStates.get(v));
+                hexagons.get(i).vertices.get(v).setCity(cityStates.get(v));
+            }
+        }
+        
         // Update the sumDice value
         try {
             sumDice = Integer.parseInt(sumDicePart);
         } catch (NumberFormatException e) {
             System.out.println("Invalid sumDice value");
         }
+    }
     
-        //System.out.println("Game state updated successfully!");
-    }    
+    
     public void setIps(String[] ips){
         for(int i=0; i<players.size(); i++){
             players.get(i).setIp(ips[i]);

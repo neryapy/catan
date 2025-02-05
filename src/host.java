@@ -1,11 +1,11 @@
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-
+import java.nio.ByteBuffer;
 public class host {
     private Board b;
     private Ui ui;
-    private volatile boolean running = true; // Flag to control the loop
+    private volatile boolean running = true;
 
     public host(String[] hostAddr, int pt) {
         String[] hostAddresses = hostAddr;
@@ -13,22 +13,32 @@ public class host {
         b = new Board(hostAddresses.length);
         b.setIps(hostAddresses);
         ui = new Ui(b);
-        // Start the loop in a separate thread
+        ui.setOwnIp(hostAddresses[0]);
+
         new Thread(() -> {
             try (DatagramSocket socket = new DatagramSocket()) {
                 while (running) {
                     for (String host : hostAddresses) {
                         try {
                             InetAddress address = InetAddress.getByName(host);
-                            byte[] buffer = b.exportGameState().getBytes();
-                            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, port);
-                            socket.send(packet);
+                            String gameState = b.exportGameState();
+                            byte[] gameStateBytes = gameState.getBytes();
+                            byte[] sizeHeader = ByteBuffer.allocate(4).putInt(gameStateBytes.length).array();
+                            // Send size header
+                            DatagramPacket sizePacket = new DatagramPacket(sizeHeader, sizeHeader.length, address, port);
+                            socket.send(sizePacket);
+
+                            // Send actual data
+                            DatagramPacket dataPacket = new DatagramPacket(gameStateBytes, gameStateBytes.length, address, port);
+                            socket.send(dataPacket);
+
+                            System.out.println("the host was sent the game state");
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                     try {
-                        Thread.sleep(100); // Sleep for 100 milliseconds
+                        Thread.sleep(2100);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         break;
@@ -40,7 +50,6 @@ public class host {
         }).start();
     }
 
-    // Stop the loop gracefully
     public void stop() {
         running = false;
     }

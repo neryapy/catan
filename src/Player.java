@@ -12,6 +12,7 @@ public class Player {
     private String ip;
     private Board Board;
     private boolean BuildVillage=false;
+    private boolean diceturned=false;
     public Player(int number, Board h) {
         this.Board=h;
         this.number = number;
@@ -25,6 +26,12 @@ public class Player {
     }
     public void setBuildVillage(boolean b){
         BuildVillage=b;
+    }
+    public boolean getDiceTurned(){
+        return diceturned;
+    }
+    public void setDiceTurned(boolean b){
+        diceturned=b;
     }
     public void buyDevCard(){
         ArrayList<Resource> requirements=new ArrayList<>();
@@ -104,20 +111,7 @@ public class Player {
     public ArrayList<Resource> getResources() {return resources;}
     public void removeResource(ArrayList<Resource> r){resources.removeAll(r);}
     public void addVillage(Village v) {
-        ArrayList<Resource> villagResouces=new ArrayList();
-        villagResouces.add(new Resource("grain"));
-        villagResouces.add(new Resource("lumber"));
-        villagResouces.add(new Resource("brick"));
-        villagResouces.add(new Resource("wool"));
-        if(resources.containsAll(villagResouces)){
-            this.villages.add(new Village(v.index, v.vertex, number));
-            Board.getHexagonResources().get(v.index).getVertex(v.vertex).setVillage(true);}
-        else{
-            System.out.println("you dont have the resouces"+resources.size());
-            for(int i=0; i<resources.size(); i++){
-                System.out.println(resources.get(i).getType());
-            }
-        }
+        villages.add(v);
     }
 
     public void addRoad(Road r) {

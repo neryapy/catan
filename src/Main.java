@@ -4,5 +4,6 @@ public class Main {
         //String[] j = {"192.168.1.160", "192.168.1.16","192.168.1.13"};
         //new host(j, 555);
         new PartyManager();
+        //new Ui(new Board(3));
     }
 }

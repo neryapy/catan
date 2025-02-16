@@ -244,7 +244,6 @@ public class Ui extends JPanel {
     private void colorAllVertices() {
         int hexIndex=0;
         coloredVertices.clear(); // Clear previous vertices if any
-
         // Loop through each hexagon and its vertices
         for (hexIndex = 0; hexIndex < board.getHexagons().size(); hexIndex++) {
             Point hexCenter = centerPoints.get(hexIndex); // Get the center point of the hexagon
@@ -271,90 +270,17 @@ public class Ui extends JPanel {
         repaint(); // Trigger a repaint to actually draw the colored vertices
     }
     private void clearClickedVertex(Point clickPoint) {
+
         int hexClicked = -1;
         int vertexClicked = -1;
-        System.out.println("estimated: "+clickPoint.y+" exact: "+(hexMiddlePoints[0].y-50));
-        //v5=(mx+50), (my-25)
-        //v4=(mx), (my-50)
-        //v3=(mx-50), (my-25)
-        //v2=(mx-50), (my+25)
-        //v1=(mx), (my+50)
-        //v0=(mx+50), (my+25)
-        // Iterate through the list of colored vertices
-        var iterator = coloredVertices.iterator();
-        Point clickedVertex = null; // Variable to store the clicked vertex
-
-        // First, we check if any vertex is clicked and needs its village state updated
-        while (iterator.hasNext()) {
-            Point vertex = iterator.next();
-
-            // Define the radius for detecting a click on the vertex
-            int circleRadius = 15; // Radius of the drawn circle for detection
-            Rectangle boundingBox = new Rectangle(vertex.x - circleRadius, vertex.y - circleRadius, circleRadius * 2, circleRadius * 2);
-
-            // Check if the clicked point is within the bounding box of the vertex
-            if (boundingBox.contains(clickPoint)) {
-                // Find which hexagon and vertex were clicked
-                for (int hexIndex = 0; hexIndex < board.getHexagons().size(); hexIndex++) {
-                    Point hexCenter = centerPoints.get(hexIndex); // Get the center point of the hexagon
-                    for (int vertexIndex = 0; vertexIndex < 6; vertexIndex++) {
-                        double angle = Math.toRadians(60 * vertexIndex) + Math.toRadians(90);
-                        int px = (int) (hexCenter.x + HEX_RADIUS * Math.cos(angle));
-                        int py = (int) (hexCenter.y + HEX_RADIUS * Math.sin(angle));
-                        Point hexVertex = new Point(px, py);
-
-                        // If this is the clicked vertex
-                        if (hexVertex.equals(vertex)) {
-                            // Print the hexagon index and vertex index
-
-                            // Check the current village state at the vertex
-                            boolean hasVillage = board.getHexagons().get(hexIndex).getVertices().get(vertexIndex).getVillage();
-
-                            // If the village is not present, update it to true
-                            if (!hasVillage) {
-                                board.getHexagons().get(hexIndex).getVertices().get(vertexIndex).setVillage(true);
-                                clickedVertex = hexVertex; // Store the clicked vertex for later reference
-                            }
-
-                            break; // Stop once we update the village state for the clicked vertex
-                        }
-                    }
-                }
-
-                break;  // Stop after processing the clicked vertex
-            }
-
-
-        }
-
-        // Now, we clear the color of all vertices except those with village == true
-        coloredVertices.clear(); // First clear the list of colored vertices
-
-        // Iterate over all getHexagonResources() and vertices to redraw them
-        for (int hexIndex = 0; hexIndex < board.getHexagons().size(); hexIndex++) {
-            Point hexCenter = centerPoints.get(hexIndex);
-
-            for (int vertexIndex = 0; vertexIndex < 6; vertexIndex++) {
-                double angle = Math.toRadians(60 * vertexIndex) + Math.toRadians(90);
-                int px = (int) (hexCenter.x + HEX_RADIUS * Math.cos(angle));
-                int py = (int) (hexCenter.y + HEX_RADIUS * Math.sin(angle));
-                Point hexVertex = new Point(px, py);
-
-                boolean hasVillage = board.getHexagons().get(hexIndex).getVertices().get(vertexIndex).getVillage();
-
-                // If the vertex has a village, keep it red
-                if (hasVillage) {
-                    coloredVertices.add(hexVertex); // Add the vertex with village to the coloredVertices list
-                }
-            }
-        }
+        coloredVertices.clear();
         for(int i=0; i<board.getHexagons().size(); i++){
             if(hexMiddlePoints[i].x-55<=clickPoint.x && hexMiddlePoints[i].x+55>=clickPoint.x&&hexMiddlePoints[i].y-55<=clickPoint.y&&hexMiddlePoints[i].y+55>=clickPoint.y){
                 hexClicked=i;
+                System.out.println("hex clicked: "+hexClicked);
             }
-            System.out.println("hex clicked: "+hexClicked);
-            
         }
+        
         if(hexMiddlePoints[hexClicked].x+60>=clickPoint.x&&hexMiddlePoints[hexClicked].x+40<=clickPoint.x&&hexMiddlePoints[hexClicked].y+35>=clickPoint.y&&hexMiddlePoints[hexClicked].y+15<=clickPoint.y){
             vertexClicked=0;
             System.out.println("vertex 0");}
@@ -373,10 +299,11 @@ public class Ui extends JPanel {
         if(hexMiddlePoints[hexClicked].x+60>=clickPoint.x&&hexMiddlePoints[hexClicked].x+40<=clickPoint.x&&hexMiddlePoints[hexClicked].y-15>=clickPoint.y&&hexMiddlePoints[hexClicked].y-35<=clickPoint.y){
             vertexClicked=5;
             System.out.println("vertex 5");}
-        System.out.println("click point: x:"+clickPoint.x+" y:"+clickPoint.y+"middle hex: x:"+hexMiddlePoints[hexClicked].x+" y:"+hexMiddlePoints[hexClicked].y);
-        System.out.println("hex clicked: "+hexClicked+" vertex clicked: "+vertexClicked);
-        repaint(); // Trigger repaint to update the board after the changes
         villageclicked=new Village(hexClicked, vertexClicked,playerPlayNum(board.getPlayers()));
+        board.players.get(playerPlayNum(board.getPlayers())).villages.add(villageclicked);
+        board.addVillageInHexagon(villageclicked);
+        addVillageToDraw(villageclicked);
+        repaint();
     }
     private int playerPlayNum(ArrayList<Player> getPlayers) {
         for (int i = 0; i < getPlayers.size(); i++) {if (getPlayers.get(i).isPlayerPlay()) {return i;}}
@@ -722,11 +649,32 @@ public class Ui extends JPanel {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
+    private void addVillageToDraw(Village village){
+        Point[] fPoints = {
+            new Point(45, 25),//fine
+            new Point(0, 45),
+            new Point(-45, 25),//fine
+            new Point(-45, -25),//fine
+            new Point(0, -45),
+            new Point(45, -25)//fine
+        };
+        Point vertex = new Point(hexMiddlePoints[village.index].x+fPoints[village.getVertex()].x, hexMiddlePoints[village.index].y+fPoints[village.getVertex()].y);
+        coloredVertices.add(vertex);
+    }
     public void updateAll(Board board){
         this.board=board;
         this.sumDice=board.getSumDice();
         this.playerPlayLabel.setText("Player play: " + (playerPlayNum(board.getPlayers())+1));
         this.cubesJLabel.setText("the sum of the dice: "+sumDice);
+        
+        for(int k=0; k<board.getHexagons().size(); k++){
+            for(int j=0; j<board.getHexagons().get(k).getVertices().size(); j++){
+                if(board.getHexagons().get(k).getVertices().get(j).getVillage()){
+                    addVillageToDraw(new Village(k, j, playerPlayNum(board.getPlayers())));
+                }
+                //System.out.println("hexagon: "+k+", vertex: "+j+" -> village: "+board.getHexagons().get(k).getVertices().get(j).getVillage());
+            }
+        }
         this.frame.repaint();
     }
 }

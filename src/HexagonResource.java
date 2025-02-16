@@ -42,11 +42,15 @@ public class HexagonResource implements Comparable<HexagonResource> {
     public List<lineHexagon> getLines() {
         return lines;
     }
-
+    public void setNumber(int number){
+        this.number=number;
+    }
     public String getResourceType() {
         return resourceType;
     }
-
+    public void setResourceType(String resourceType) {
+        this.resourceType = resourceType;
+    }
     public int getNumber() {
         return number;
     }

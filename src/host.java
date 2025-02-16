@@ -32,7 +32,7 @@ public class host {
                             DatagramPacket dataPacket = new DatagramPacket(gameStateBytes, gameStateBytes.length, address, port);
                             socket.send(dataPacket);
 
-                            System.out.println("the host was sent the game state");
+                            //System.out.println("the host was sent the game state");
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

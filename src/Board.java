@@ -195,7 +195,7 @@ public class Board{
                     }
                 }
                 if(hexagon.getIndex()==tempVillage.index) hexagon.vertices.get(tempVillage.getVertex()).setVillage(true); 
-                System.out.println(tempVillage.index+" "+tempVillage.getVertex()+" "+tempVillage.owner);
+                //System.out.println(tempVillage.index+" "+tempVillage.getVertex()+" "+tempVillage.owner);
                 hexagons.add(hexagon);
                 //if(tempVillage.index!=-1&&tempVillage.getIndex()!=-1&&tempVillage.owner!=-1) hexagons.get(tempVillage.getIndex()).vertices.get(tempVillage.getVertex()).setVillage(true);
                 
@@ -224,6 +224,11 @@ public class Board{
         return players;
     }
     public void addVillageInHexagon(Village v){hexagons.get(v.getIndex()).vertices.get(v.getVertex()).setVillage(true);}
+    public void addCityInHexagon(City c){hexagons.get(c.index).vertices.get(c.vertex).setCity(true);}
+    public void addRoad(Road r){hexagons.get(r.getIndexHexagon()).vertices.get(r.getv2()).setRoad(true);
+        hexagons.get(r.getIndexHexagon()).vertices.get(r.getv1()).setRoad(true);
+        players.get(playerPlayNum()-1).addRoad(r);}
+    
     public List<HexagonResource> getHexagonResources(){return hexagons;}
     public void setSumDice(int x){sumDice=x;}
     public void addResourceByPlayer(int ip, String type){players.get(ip).resources.add(new Resource(type));}

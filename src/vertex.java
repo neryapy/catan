@@ -6,13 +6,19 @@ public class vertex {
     private int index;
     private boolean village;
     private boolean city;
-    
+    private Boolean road;
     HashMap<Integer, Integer> connectedHexagons = new HashMap<Integer, Integer>();
     private vertex vertexPoint;
     public vertex(int index) {
         this.index = index;
         this.village=false;
         this.city=false;
+    }
+    public void setRoad(Boolean road) {
+        this.road = road;
+    }
+    public Boolean getRoad() {
+        return road;
     }
     public int getIndex() {
         return index;

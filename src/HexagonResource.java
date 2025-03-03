@@ -67,7 +67,6 @@ public class HexagonResource implements Comparable<HexagonResource> {
     public int compareTo(HexagonResource other) {
         return Integer.compare(this.index, other.index);
     }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

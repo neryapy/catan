@@ -12,6 +12,8 @@ public class Player {
     private String ip;
     private Board Board;
     private boolean BuildVillage=false;
+    private boolean BuildCity=false;
+    private boolean BuildRoad=false;
     private boolean diceturned=false;
     public Player(int number, Board h) {
         this.Board=h;
@@ -26,6 +28,21 @@ public class Player {
     }
     public void setBuildVillage(boolean b){
         BuildVillage=b;
+    }
+    public void setBuildCity(boolean b){
+        BuildCity=b;
+    }
+    public void setBuildRoad(boolean b){
+        BuildRoad=b;
+    }
+    public boolean getBuildVillage(){
+        return BuildVillage;
+    }
+    public boolean getBuildCity(){
+        return BuildCity;
+    }
+    public boolean getBuildRoad(){
+        return BuildRoad;
     }
     public boolean getDiceTurned(){
         return diceturned;
@@ -56,9 +73,9 @@ public class Player {
     }
     public void useDevCard(devCard d){
         if(playerDevCards.contains(d)){
-            if(d.getType()=="knight")useKnight(1);
-            if(d.getType()=="year of plenty")useYearPlenty(new Resource("brick"), new Resource("ore"));
-            if(d.getType()=="road building")useRoadBuilding(new Road(0,0),new Road(1,1));
+            if(d.getType()=="knight") useKnight(1);
+            if(d.getType()=="year of plenty" )useYearPlenty(new Resource("brick"), new Resource("ore"));
+            if(d.getType()=="road building") useRoadBuilding(new Road(0,0,0),new Road(1,1,0));
         }
     }
     public String getIp(){return ip;}
@@ -113,11 +130,13 @@ public class Player {
     public void addVillage(Village v) {
         villages.add(v);
     }
-
+    public ArrayList<Road> getRoads() {
+        return roads;
+    }
     public void addRoad(Road r) {
-        this.roads.add(new Road(r.getIndexLine(), number));
-        Board.getHexagonResources().get(r.getIndexLine()).getLines().get(r.getIndexLine()).setRoad(true);
-        if(Board.getHexagonResources().get(r.getIndexLine()).getLines().get(r.getIndexLine()).hasRoad()==true){
+        this.roads.add(new Road(r.getIndexHexagon(), r.getv1(), r.getv2()));
+
+        if(Board.getHexagonResources().get(r.getIndexHexagon()).getVertices().get(r.getv1()).getRoad()==true&&Board.getHexagonResources().get(r.getIndexHexagon()).getVertices().get(r.getv2()).getRoad()==true){
             System.out.println("true");
         }
     }
@@ -184,7 +203,9 @@ public class Player {
     public String roadsString(){
         String ret="";
         for(int i=0; i<roads.size(); i++){
-            ret+=roads.get(i).getIndexLine()+", ";
+            ret+="["+roads.get(i).getIndexHexagon()+", ";
+            ret+=roads.get(i).getv1()+", ";
+            ret+=roads.get(i).getv2()+"]";
         }
         return ret;
     }

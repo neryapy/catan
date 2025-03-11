@@ -50,7 +50,11 @@ public class Player {
     public void setDiceTurned(boolean b){
         diceturned=b;
     }
+    public ArrayList<Village> getVillages() {
+        return villages;
+    }
     public void buyDevCard(){
+
         ArrayList<Resource> requirements=new ArrayList<>();
         requirements.add(new Resource("wool"));
         requirements.add(new Resource("ore"));
@@ -136,20 +140,19 @@ public class Player {
     public void addRoad(Road r) {
         this.roads.add(new Road(r.getIndexHexagon(), r.getv1(), r.getv2()));
 
-        if(Board.getHexagonResources().get(r.getIndexHexagon()).getVertices().get(r.getv1()).getRoad()==true&&Board.getHexagonResources().get(r.getIndexHexagon()).getVertices().get(r.getv2()).getRoad()==true){
+        if(Board.getHexagons().get(r.getIndexHexagon()).getVertices().get(r.getv1()).getRoad()==true&&Board.getHexagons().get(r.getIndexHexagon()).getVertices().get(r.getv2()).getRoad()==true){
             System.out.println("true");
         }
     }
-    public void useRobber(int indexHexagon){Board.getHexagonResources().get(indexHexagon).setHasRobber(true);}
+    public void useRobber(int indexHexagon){Board.getHexagons().get(indexHexagon).setHasRobber(true);}
     public void addCity(City city) {
-        if(Board.getHexagonResources().get(city.index).getVertex(city.vertex).getVillage()==true&&this.villages.get(city.index).owner==number) {
-            this.Cities.add(new City(city.index, city.vertex, number));
-            Board.getHexagonResources().get(city.index).getVertex(city.vertex).setCity(true);
-            System.out.println("index of village " + Board.getHexagonResources().get(city.index).getVertex(city.vertex).getIndex());
-        }
-        else{
-            System.out.println("you cannot add city because have no village");
-        }
+            Cities.add(new City(city.index, city.vertex, number));
+            for(int i=0; i<villages.size(); i++){
+                if(villages.get(i).index==city.index&&villages.get(i).vertex==city.vertex){
+                    villages.remove(i);
+                }
+            }
+            allPoints+=2;
     }
     public int getNumber() {
         return number;

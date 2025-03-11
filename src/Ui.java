@@ -29,13 +29,14 @@ import javax.swing.Timer;
 //385
 public class Ui extends JPanel {
 
-    private static final int HEX_RADIUS = 50; // Radius of the getHexagonResources()
-    private static final int X_SPACING = -15; // Spacing between getHexagonResources() horizontally
-    private static final int Y_SPACING = 0;  // Spacing between rows of getHexagonResources()
+    private static final int HEX_RADIUS = 50; // Radius of the getHexagons()
+    private static final int X_SPACING = -15; // Spacing between getHexagons() horizontally
+    private static final int Y_SPACING = 0;  // Spacing between rows of getHexagons()
     private static final int HEX_HEIGHT = 75; // Height of each hexagon
     private ArrayList<Point> centerPoints = new ArrayList<>();
-    private ArrayList<Point> coloredVertices = new ArrayList<>();
+    private ArrayList<Point> OptionVillage = new ArrayList<>();
     private List<Line2D> roadLines=new ArrayList<>();
+    private List<Line2D> PlacedRoadsLine=new ArrayList<>();
     private ArrayList<JPanel> resourceCircles = new ArrayList<>();
     private JPanel circlePanel;
     private int sumDice;
@@ -46,11 +47,25 @@ public class Ui extends JPanel {
     private JFrame frame = new JFrame("CATAN");
     private String ownIp="";
     private Village villageclicked;
+    private List<Point> villagesToDraw=new ArrayList<>();
+    private List<Integer> villagesPlayersTOdraw=new ArrayList<>();
     private List<Road> roadsDrawed= new ArrayList<>();
+    private List<Point> CityToDraw=new ArrayList<>();
+    private List<Point> FinnalyPlaccedCity=new ArrayList<>();
+    private List<Integer> CitysPlayersPlace=new ArrayList<>();
     private List<Integer> villagesPlayersPlace=new ArrayList<>();
+    private List<Integer> PermanatntRoadsPlayersPlace=new ArrayList<>();
     private List<Integer> roadsPlayersPlace=new ArrayList<>();
+    Point[] fPoints = {
+        new Point(45, 25), //fine
+        new Point(0, 50),
+        new Point(-45, 27), //fine
+        new Point(-45, -27), //fine
+        new Point(0, -50),
+        new Point(45, -25) //fine
+    };
     public Ui(Board board) {
-        if(board.getHexagonResources()!=null){
+        if(board.getHexagons()!=null){
             this.board=board;
             setupUI();
         }
@@ -97,16 +112,16 @@ public class Ui extends JPanel {
         // Clear old center points to avoid duplication during resizing
         centerPoints.clear();
 
-        // Draw getHexagonResources() and calculate their center points
+        // Draw getHexagons() and calculate their center points
         int rowCount = 0;
         int hexCount = 0;
-        for (int i = 0; i < board.getHexagonResources().size(); i++) {
+        for (int i = 0; i < board.getHexagons().size(); i++) {
             int rowHexCount = getHexCountForRow(rowCount);
             for (int j = 0; j < rowHexCount; j++) {
                 float x = calculateHexX(j, rowCount) - 200;
                 int y = calculateHexY(rowCount) - 200;
                 centerPoints.add(new Point((int) x, y));
-                HexagonResource hex = board.getHexagonResources().get(hexCount);
+                HexagonResource hex = board.getHexagons().get(hexCount);
                 drawBeautifulHexagon(g2d, (int) x, y, HEX_RADIUS, getResourceColor(hex.getResourceType()), hex.getResourceType(), hex.getNumber());
                 hexMiddlePoints[hexCount]=new Point((int) x, y);
                 hexCount++;
@@ -116,14 +131,27 @@ public class Ui extends JPanel {
         
 
         // Draw vertices based on color (use the stored list of vertices)
-        for (int i=0; i<coloredVertices.size(); i++) {
-            if(coloredVertices.size()>0&&villagesPlayersPlace.size()>0){
-                Point vertex = coloredVertices.get(i);
+        if(OptionVillage.size()>0){
+        for (int i=0; i<OptionVillage.size(); i++) {
+            if(OptionVillage.size()>0&&villagesPlayersPlace.size()>0){
+                Point vertex = OptionVillage.get(i);
                 if(villagesPlayersPlace.get(i)==0) g2d.setColor(new Color(255, 94, 0));
                 else if(villagesPlayersPlace.get(i)==1) g2d.setColor(new Color(169, 199, 156));
                 else if(villagesPlayersPlace.get(i)==2) g2d.setColor(new Color(207, 0, 0));
                 else if(villagesPlayersPlace.get(i)==3) g2d.setColor(new Color(21, 174, 171));
                 g2d.fillOval(vertex.x - 5, vertex.y - 5, 10, 10); // Draw vertex as a small circle
+            }
+        }}
+        if(villagesToDraw.size()>0){
+            for (int i=0; i<villagesToDraw.size(); i++) {
+                if(villagesToDraw.size()==villagesPlayersTOdraw.size()&&villagesPlayersTOdraw.size()>0){
+                    Point vertex = villagesToDraw.get(i);
+                    if(villagesPlayersTOdraw.get(i)==0) g2d.setColor(new Color(255, 94, 0));
+                    else if(villagesPlayersTOdraw.get(i)==1) g2d.setColor(new Color(169, 199, 156));
+                    else if(villagesPlayersTOdraw.get(i)==2) g2d.setColor(new Color(207, 0, 0));
+                    else if(villagesPlayersTOdraw.get(i)==3) g2d.setColor(new Color(21, 174, 171));
+                    g2d.fillOval(vertex.x - 5, vertex.y - 5, 10, 10); // Draw vertex as a small circle
+                }
             }
         }
         if(roadLines!=null){
@@ -140,22 +168,44 @@ public class Ui extends JPanel {
                 }
             }    
         }
-        Point[] fPoints = {
-            new Point(37, 27),//fine
-            new Point(0, -24),
-            new Point(-48, 27),//fine
-            new Point(-48, -27),//fine
-            new Point(0, 15),
-            new Point(37, -27)//fine
-        };
-        System.out.println(hexMiddlePoints.length);
+        if(PlacedRoadsLine!=null){
+            for (int i=0; i<PlacedRoadsLine.size(); i++){
+                if(PlacedRoadsLine.size()==PermanatntRoadsPlayersPlace.size()&&PermanatntRoadsPlayersPlace.size()>0){
+                Line2D line = PlacedRoadsLine.get(i);
+                if(PermanatntRoadsPlayersPlace.get(i)==0) g2d.setColor(new Color(255, 94, 0));
+                else if(PermanatntRoadsPlayersPlace.get(i)==1) g2d.setColor(new Color(169, 199, 156));
+                else if(PermanatntRoadsPlayersPlace.get(i)==2) g2d.setColor(new Color(207, 0, 0));
+                else if(PermanatntRoadsPlayersPlace.get(i)==3) g2d.setColor(new Color(21, 174, 171));
+
+                g2d.setStroke(new BasicStroke(4));
+                g2d.drawLine((int) line.getX1(), (int) line.getY1(), (int) line.getX2(), (int) line.getY2());
+                }
+            }    
+        }
+        if(CityToDraw!=null&&CitysPlayersPlace!=null){
+            for (int i=0; i<CitysPlayersPlace.size(); i++){
+                if(CitysPlayersPlace.get(i)==0) g2d.setColor(new Color(255, 94, 0));
+                else if(CitysPlayersPlace.get(i)==1) g2d.setColor(new Color(169, 199, 156));
+                else if(CitysPlayersPlace.get(i)==2) g2d.setColor(new Color(207, 0, 0));
+                else if(CitysPlayersPlace.get(i)==3) g2d.setColor(new Color(21, 174, 171));
+            }
+            for(Point ActualPoint:CityToDraw){
+                g2d.fillRect(ActualPoint.x-10, ActualPoint.y-10, 20, 20);
+
+            }
+        }
+        if(FinnalyPlaccedCity!=null){
+            for(Point ActualPoint:FinnalyPlaccedCity){
+                g2d.fillRect(ActualPoint.x-10, ActualPoint.y-10, 20, 20);
+            }
+        }
         int num1 = 0;
         while (num1 < 6) { // Replace 6 with your desired upper limit for num1
             int num2 = 0;
             while (num2 < 6) { // Replace 6 with your desired upper limit for num2
                 for (int i = 0; i < hexMiddlePoints.length - 1; i++) {
                     if ((hexMiddlePoints[i].getX() + fPoints[num2].x) == (hexMiddlePoints[i + 1].getX() + fPoints[num1].x)&&(hexMiddlePoints[i].getY() + fPoints[num2].y) == (hexMiddlePoints[i + 1].getY() + fPoints[num1].y)) {
-                        board.getHexagonResources().get(i).vertices.get(num2).connectHexagon(i + 1, num1);
+                        board.getHexagons().get(i).vertices.get(num2).connectHexagon(i + 1, num1);
                         //System.out.println("hexagon: " + i + ", vertex: " + num2 + " -> hexagon: " + (i + 1) + ", vertex: " + num1);
                     }
                     //System.out.println("debug: " + (hexMiddlePoints[i].getY() + fPoints[num2].y) + " -> " + (hexMiddlePoints[i + 1].getY() + fPoints[num1].y)+"| hexagon: " + i + ", vertex: " + num2 + " -> hexagon: " + (i + 1) + ", vertex: " + num1);
@@ -169,7 +219,7 @@ public class Ui extends JPanel {
    
     
 
-    // Improved method to draw getHexagonResources() with gradient fill and shadows
+    // Improved method to draw getHexagons() with gradient fill and shadows
     private void drawBeautifulHexagon(Graphics2D g2d, int x, int y, int radius, Color color, String resource, int number) {
         Polygon hexagon = new Polygon();
         double rotationAngle = Math.toRadians(90);
@@ -267,37 +317,35 @@ public class Ui extends JPanel {
         }
     }
 
-    private void colorAllVertices() {
-
-        int hexIndex=0;
-        villagesPlayersPlace.clear();
-        coloredVertices.clear(); // Clear previous vertices if any
-        // Loop through each hexagon and its vertices
-        for (hexIndex = 0; hexIndex < board.getHexagons().size(); hexIndex++) {
-            Point hexCenter = centerPoints.get(hexIndex); // Get the center point of the hexagon
-
-            // Get the vertices of the current hexagon
-            for (int vertexIndex = 0; vertexIndex < 6; vertexIndex++) {
-                double angle = Math.toRadians(60 * vertexIndex) + Math.toRadians(90); // Calculate angle for each vertex
-                int px = (int) (hexCenter.x + HEX_RADIUS * Math.cos(angle));   // Calculate x based on angle
-                int py = (int) (hexCenter.y + HEX_RADIUS * Math.sin(angle));   // Calculate y based on angle
-                Point vertex = new Point(px, py);
-
-                // Check if the vertex has a village
-                boolean hasVillage = board.getHexagons().get(hexIndex).getVertices().get(vertexIndex).getVillage();
-                villagesPlayersPlace.add(playerPlayNum(board.getPlayers()));
-                coloredVertices.add(new Point(px, py));
+    private void buildVillage() {
+        if(board.getplayers().get(playerPlayNum(board.getPlayers())).getBuildRoad()==false&&board.getplayers().get(playerPlayNum(board.getPlayers())).getBuildCity()==false&&board.getplayers().get(playerPlayNum(board.getPlayers())).getBuildVillage()==true){
+            int hexIndex=0;
+            villagesPlayersPlace.clear();
+            // Loop through each hexagon and its vertices
+            for (hexIndex = 0; hexIndex < board.getHexagons().size(); hexIndex++) {
+                Point hexCenter = centerPoints.get(hexIndex); // Get the center point of the hexagon
+                // Get the vertices of the current hexagon
+                for (int vertexIndex = 0; vertexIndex < 6; vertexIndex++) {
+                    double angle = Math.toRadians(60 * vertexIndex) + Math.toRadians(90); // Calculate angle for each vertex
+                    int px = (int) (hexCenter.x + HEX_RADIUS * Math.cos(angle));   // Calculate x based on angle
+                    int py = (int) (hexCenter.y + HEX_RADIUS * Math.sin(angle));   // Calculate y based on angle
+                    // Check if the vertex has a village
+                    villagesPlayersPlace.add(playerPlayNum(board.getPlayers()));
+                    OptionVillage.add(new Point(px, py));
+                }
             }
-        }
 
-        repaint(); // Trigger a repaint to actually draw the colored vertices
-    }
-    private void clearClickedVertex(Point clickPoint) {
             board.players.get(playerPlayNum(board.getPlayers())).setBuildVillage(true);
+            repaint(); // Trigger a repaint to actually draw the colored vertices
+        }
+    }
+    private void addVillage(Point clickPoint) {
+            if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getBuildVillage()){
+            OptionVillage.clear(); // Clear previous vertices if any
             int hexClicked = -1;
             int vertexClicked = -1;
             villagesPlayersPlace.clear();
-            coloredVertices.clear();
+            OptionVillage.clear();
             for(int i=0; i<board.getHexagons().size(); i++){
                 if(hexMiddlePoints[i].x-55<=clickPoint.x && hexMiddlePoints[i].x+55>=clickPoint.x&&hexMiddlePoints[i].y-55<=clickPoint.y&&hexMiddlePoints[i].y+55>=clickPoint.y){
                     hexClicked=i;
@@ -332,7 +380,9 @@ public class Ui extends JPanel {
             board.addVillageInHexagon(villageclicked);
             addVillageToDraw(villageclicked);
             repaint();
+            
             board.players.get(playerPlayNum(board.getPlayers())).setBuildVillage(false);
+            }
     }
     private int playerPlayNum(ArrayList<Player> getPlayers) {
         for (int i = 0; i < getPlayers.size(); i++) {if (getPlayers.get(i).isPlayerPlay()) {return i;}}
@@ -365,61 +415,43 @@ public class Ui extends JPanel {
     }
 
     private void BuildRoad() {
-        Point[] fPoints = {
-            new Point(45, 25), //fine
-            new Point(0, 50),
-            new Point(-45, 27), //fine
-            new Point(-45, -27), //fine
-            new Point(0, -50),
-            new Point(45, -25) //fine
-        };
-
-        for (int i = 0; i < hexMiddlePoints.length; i++) {
-            for (int k = 0; k < fPoints.length; k++) {
-
-                if(board.getHexagons().get(i).vertices.get(k).getVillage()||board.getHexagons().get(i).vertices.get((k+1)%6).getVillage()){
-                    roadLines.add(new Line2D.Float(
-                        hexMiddlePoints[i].x + fPoints[k].x, hexMiddlePoints[i].y + fPoints[k].y,
-                        hexMiddlePoints[i].x + fPoints[(k + 1) % 6].x, hexMiddlePoints[i].y + fPoints[(k + 1) % 6].y
-                    ));
-                    roadsDrawed.add(new Road(i, k, (k + 1) % 6));
-                    roadsPlayersPlace.add(playerPlayNum(board.getPlayers()));
-                    JButton roadButton = new JButton("Road");
-                    System.out.println("width="+Math.sqrt(Math.pow((hexMiddlePoints[i].x + fPoints[k].x-(hexMiddlePoints[i].x + fPoints[(k + 1) % 6].x)),2)+Math.pow((hexMiddlePoints[i].y + fPoints[k].y-(hexMiddlePoints[i].y + fPoints[(k + 1) % 6].y)),2)));
-                    System.out.println("height=");
-                    board.players.get(playerPlayNum(board.getPlayers())).setBuildRoad(true);
+        if(board.getplayers().get(playerPlayNum(board.getPlayers())).getBuildCity()==false&&board.getplayers().get(playerPlayNum(board.getPlayers())).getBuildVillage()==false){
+            for (int i = 0; i < hexMiddlePoints.length; i++) {
+                for (int k = 0; k < fPoints.length; k++) {
+                    if(board.getHexagons().get(i).vertices.get(k).getVillage()||board.getHexagons().get(i).vertices.get((k+1)%6).getVillage()||board.getHexagons().get(i).vertices.get(k).getCity()||board.getHexagons().get(i).vertices.get((k+1)%6).getCity()){
+                        roadLines.add(new Line2D.Float(
+                            hexMiddlePoints[i].x + fPoints[k].x, hexMiddlePoints[i].y + fPoints[k].y,
+                            hexMiddlePoints[i].x + fPoints[(k + 1) % 6].x, hexMiddlePoints[i].y + fPoints[(k + 1) % 6].y
+                        ));
+                        roadsDrawed.add(new Road(i, k, (k + 1) % 6));
+                        roadsPlayersPlace.add(playerPlayNum(board.getPlayers()));
+                        board.players.get(playerPlayNum(board.getPlayers())).setBuildRoad(true);
+                    }
                 }
             }
+            repaint();
         }
-        
-        repaint();
 
     }
     private void addRoad(Point p){
-        int v1=-1,v2=-1,hi=-1;
-        System.out.println("you entered");
-        Point[] fPoints = {
-            new Point(45, 25), //fine
-            new Point(0, 50),
-            new Point(-45, 27), //fine
-            new Point(-45, -27), //fine
-            new Point(0, -50),
-            new Point(45, -25) //fine
-        };
-        System.out.println("size of roadlines"+roadLines.size());
+        
         for (int i=0; i<roadLines.size(); i++)
         {
             if (roadLines.get(i).ptSegDist(p.getX(), p.getY()) < 5) { // If the click is within 5 pixels of the line
-                for(Road actualRoad:roadsDrawed){
+                for(int j=0; j<roadsDrawed.size(); j++){
+                    Road actualRoad=roadsDrawed.get(j);
                     System.out.println("actual road:"+(hexMiddlePoints[actualRoad.getIndexHexagon()].y + fPoints[actualRoad.getv1()].y)+" "+p.y);
                     if(hexMiddlePoints[actualRoad.getIndexHexagon()].y + fPoints[actualRoad.getv1()].y<=p.y&&hexMiddlePoints[actualRoad.getIndexHexagon()].y + fPoints[actualRoad.getv2()].y>=p.y){
                         System.out.println("hexindex of road :"+actualRoad.getIndexHexagon()+" v1: "+actualRoad.getv1()+" v2: "+actualRoad.getv2());
-                        roadLines=new ArrayList<>();
-                        roadLines.add(new Line2D.Float(
+                        
+                        PlacedRoadsLine.add(new Line2D.Float(
                             hexMiddlePoints[actualRoad.getIndexHexagon()].x + fPoints[actualRoad.getv1()].x, hexMiddlePoints[actualRoad.getIndexHexagon()].y + fPoints[actualRoad.getv1()].y,
                             hexMiddlePoints[actualRoad.getIndexHexagon()].x + fPoints[actualRoad.getv2()].x, hexMiddlePoints[actualRoad.getIndexHexagon()].y + fPoints[actualRoad.getv2()].y
                         ));
-                        roadsPlayersPlace=new ArrayList<>();
+                        PermanatntRoadsPlayersPlace.add(playerPlayNum(board.getPlayers()));
+                        roadLines.clear();
+                        roadsDrawed.clear();
+                        roadsPlayersPlace.clear();
                         roadsPlayersPlace.add(playerPlayNum(board.getPlayers()));
                         board.addRoad(actualRoad);
                     }
@@ -431,18 +463,55 @@ public class Ui extends JPanel {
         repaint();
         board.players.get(playerPlayNum(board.getPlayers())).setBuildRoad(false);
     }
-    
+    private void buildCity(){
+        int graincount=0;
+        int orecount=0;
+        for(Resource r:board.getPlayers().get(playerPlayNum(board.getPlayers())).getResources()){if(r.getType().equals("grain")) graincount++;
+            if(r.getType().equals("ore")) orecount++;}
+        if(graincount>=2&&orecount>=3){
+            if(board.getplayers().get(playerPlayNum(board.getPlayers())).getBuildRoad()==false&&board.getplayers().get(playerPlayNum(board.getPlayers())).getBuildVillage()==false){
+                for(int i=0; i<board.getHexagons().size(); i++){
+                    for(int k=0; k<board.getHexagons().get(i).getVertices().size(); k++){
+                        if(board.getHexagons().get(i).getVertex(k).getVillage()){
+                            for(Village v:board.getplayers().get(playerPlayNum(board.getPlayers())).getVillages()){
+                                if(v.index==i&&v.getVertex()==k){
+                                    CityToDraw.add(new Point(hexMiddlePoints[i].x+fPoints[k].x, hexMiddlePoints[i].y+fPoints[k].y));
+                                    CitysPlayersPlace.add(playerPlayNum(board.getPlayers()));
+                                }
+                            }
+                        }
+                    }
+                }
+                board.players.get(playerPlayNum(board.getPlayers())).setBuildCity(true);
+                repaint();
+            }
+        }
+    }
+    private void addCity(Point point){
+        for(int i=0; i<hexMiddlePoints.length; i++){
+            for(int k=0; k<fPoints.length; k++){
+                if(hexMiddlePoints[i].x+fPoints[k].x-10<=point.x&&hexMiddlePoints[i].x+fPoints[k].x+10>=point.x&&hexMiddlePoints[i].y+fPoints[k].y-10<=point.y&&hexMiddlePoints[i].y+fPoints[k].y+10>=point.y)
+                {
+                    CityToDraw.clear();
+                    CitysPlayersPlace.clear();
+                    addCityToDraw(new City(i, k, playerPlayNum(board.getPlayers())));
+                    board.addCity(new City(i, k, playerPlayNum(board.getPlayers())));
+                    System.out.println("hex: "+i+" vertex: "+k);
+                }
+            }
+        }
+
+        board.players.get(playerPlayNum(board.getPlayers())).setBuildCity(false);
+        repaint();
+
+    }
     private void setupUI() {
         // Code to initialize the UI
         
         //create the connected vertices:
-        hexMiddlePoints = new Point[board.getHexagonResources().size()];
+        hexMiddlePoints = new Point[board.getHexagons().size()];
         //end create the connected vertices.
         this.setBackground(new Color(14, 150, 212));
-        // Create the window (JFrame) when Ui is instantiated
-        int hexagonCount = board.getHexagons().size();
-        int rowIndex = 0;
-        int rowHexCount = getHexCountForRow(rowIndex);
         
         System.out.println();
         // Set the layout for custom button placement
@@ -492,35 +561,21 @@ public class Ui extends JPanel {
         villageButton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
-                if(sumDice==0){
-                    board.players.get(playerPlayNum(board.getPlayers())).setBuildVillage(true);
-                    colorAllVertices();
-                    sumDice=-1;
-                }
-                else{
-                    if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp){
-                    //ArrayList<Resource> r=new ArrayList<>();
-                    //r.add(new Resource("grain"));
-                    //r.add(new Resource("wool"));
-                    //r.add(new Resource("lumber"));
-                    //r.add(new Resource("brick"));
-                    //board.players.get(playerPlayNum(board.getPlayers())).addResources(r);
-                    if(board.getPlayers().get(playerPlayNum(board.getPlayers())).villages.size()<2){
+                if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp){
+                    if(board.players.get(playerPlayNum(board.getPlayers())).getVillages().size()<2){
                         board.players.get(playerPlayNum(board.getPlayers())).setBuildVillage(true);
-                        board.players.get(playerPlayNum(board.getPlayers())).addVillage(villageclicked);
-                        System.out.println("-----------------------------player: "+playerPlayNum(board.getPlayers())+" villages: "+board.players.get(playerPlayNum(board.getPlayers())).villages.size());
+                        buildVillage();
                     }
-                    if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("grain"))){colorResourceAsRed(resourceCircles.get(0));}
-                    if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("brick"))){colorResourceAsRed(resourceCircles.get(3));}
-                    if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("lumber"))){colorResourceAsRed(resourceCircles.get(4));}
-                    if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("wool"))){colorResourceAsRed(resourceCircles.get(1));}
                     else{
-
-                        board.players.get(playerPlayNum(board.getPlayers())).setBuildVillage(true);
-                        if(villageclicked!=null) board.players.get(playerPlayNum(board.getPlayers())).addVillage(villageclicked);
-                        System.out.println("player: "+playerPlayNum(board.getPlayers())+" villages: "+board.players.get(playerPlayNum(board.getPlayers())).villages.size());
+                        if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("grain"))){colorResourceAsRed(resourceCircles.get(0));}
+                        if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("brick"))){colorResourceAsRed(resourceCircles.get(3));}
+                        if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("lumber"))){colorResourceAsRed(resourceCircles.get(4));}
+                        if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("wool"))){colorResourceAsRed(resourceCircles.get(1));}
+                        else{
+                            buildVillage();
+                            System.out.println("player: "+playerPlayNum(board.getPlayers())+" villages: "+board.players.get(playerPlayNum(board.getPlayers())).villages.size());
+                        }
                     }
-                }
             }
         }
         });
@@ -528,8 +583,6 @@ public class Ui extends JPanel {
         roadButton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
-                board.players.get(playerPlayNum(board.getPlayers())).addResource(new Resource("brick"));
-                board.players.get(playerPlayNum(board.getPlayers())).addResource(new Resource("lumber"));
 
                 if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp){
                 if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("brick"))){colorResourceAsRed(resourceCircles.get(3));}
@@ -543,10 +596,11 @@ public class Ui extends JPanel {
         cityButton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
+
                 if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp){
                 // Retrieve the current player's resources
                 ArrayList<Resource> resources = board.getPlayers().get(playerPlayNum(board.getPlayers())).resources;
-
+                
                 // Count the occurrences of "grain" and "ore" in the resources list
                 long grainCount = resources.stream().filter(r -> r.equals(new Resource("grain"))).count();
                 long oreCount = resources.stream().filter(r -> r.equals(new Resource("ore"))).count();
@@ -556,6 +610,9 @@ public class Ui extends JPanel {
                 }
                 if (oreCount < 3) {
                     colorResourceAsRed(resourceCircles.get(2)); // Assuming ore circle is at index 2
+                }
+                else if (grainCount >= 2 && oreCount >= 3) {
+                    buildCity();
                 }
             }
             }
@@ -624,7 +681,6 @@ public class Ui extends JPanel {
                 sumDice=randomDie();
                 board.setSumDice(sumDice);
                 cubesJLabel.setText("the sum of the dice:"+sumDice);
-                System.out.println("the sum of the dice: "+sumDice);
                 rightPanel.repaint();
                 board.players.get(playerPlayNum(board.getPlayers())).setDiceTurned(true);
             }
@@ -635,8 +691,9 @@ public class Ui extends JPanel {
         this.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
-                if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getBuildVillage()) clearClickedVertex(evt.getPoint());
+                if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getBuildVillage()) addVillage(evt.getPoint());
                 else if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getBuildRoad()) addRoad(evt.getPoint());
+                else if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getBuildCity()) addCity(evt.getPoint());
             }});
         // Panel and button setup
         rightPanel.setLayout(null); // Set layout to null for absolute positioning
@@ -680,9 +737,6 @@ public class Ui extends JPanel {
                 getResourceColor("lumber")
                 
         };
-
-
-        
         for (int i = 0; i < colors.length; i++) {
             String resourceType = ""; // Assign resource types based on your game logic order
             switch (i) {
@@ -754,17 +808,16 @@ public class Ui extends JPanel {
         frame.setVisible(true);
     }
     private void addVillageToDraw(Village village){
-        Point[] fPoints = {
-            new Point(45, 25),//fine
-            new Point(0, 45),
-            new Point(-45, 25),//fine
-            new Point(-45, -25),//fine
-            new Point(0, -45),
-            new Point(45, -25)//fine
-        };
         Point vertex = new Point(hexMiddlePoints[village.index].x+fPoints[village.getVertex()].x, hexMiddlePoints[village.index].y+fPoints[village.getVertex()].y);
-        villagesPlayersPlace.add(playerPlayNum(board.getPlayers()));
-        coloredVertices.add(vertex);
+        villagesPlayersTOdraw.add(playerPlayNum(board.getPlayers()));
+        villagesToDraw.add(vertex);
+    }
+    private void addCityToDraw(City city){
+
+        FinnalyPlaccedCity.add(new Point(hexMiddlePoints[city.index].x+fPoints[city.vertex].x, hexMiddlePoints[city.index].y+fPoints[city.vertex].y));
+        villagesToDraw.remove(new Point(hexMiddlePoints[city.index].x+fPoints[city.vertex].x, hexMiddlePoints[city.index].y+fPoints[city.vertex].y));
+        villagesPlayersTOdraw.remove(playerPlayNum(board.getPlayers()));
+        CitysPlayersPlace.add(playerPlayNum(board.getPlayers()));
     }
     public void updateAll(Board board){
         this.board=board;
@@ -776,6 +829,9 @@ public class Ui extends JPanel {
             for(int j=0; j<board.getHexagons().get(k).getVertices().size(); j++){
                 if(board.getHexagons().get(k).getVertices().get(j).getVillage()){
                     addVillageToDraw(new Village(k, j, playerPlayNum(board.getPlayers())));
+                }
+                if(board.getHexagons().get(k).getVertices().get(j).getCity()){
+                    addCityToDraw(new City(k, j, playerPlayNum(board.getPlayers())));
                 }
                 //System.out.println("hexagon: "+k+", vertex: "+j+" -> village: "+board.getHexagons().get(k).getVertices().get(j).getVillage());
             }

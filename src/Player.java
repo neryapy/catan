@@ -1,10 +1,11 @@
 import java.util.ArrayList;
+import java.util.List;
 public class Player {
     private int number;
     private int allPoints=0;
     public int publicPoints=0;
     public boolean playerPlay;
-    public ArrayList<devCard> playerDevCards=new ArrayList<>();
+    public List<devCard> playerDevCards;
     public ArrayList<Village> villages;
     public ArrayList<City> Cities;
     public ArrayList<Road> roads;
@@ -16,6 +17,7 @@ public class Player {
     private boolean BuildRoad=false;
     private boolean diceturned=false;
     public Player(int number, Board h) {
+        this.playerDevCards = new ArrayList<>();
         this.Board=h;
         this.number = number;
         this.playerPlay = false; // Initialize with false or another appropriate value
@@ -53,16 +55,17 @@ public class Player {
     public ArrayList<Village> getVillages() {
         return villages;
     }
+    public List<devCard> getPlayerDevCards(){return playerDevCards;}
     public void buyDevCard(){
 
         ArrayList<Resource> requirements=new ArrayList<>();
         requirements.add(new Resource("wool"));
         requirements.add(new Resource("ore"));
         requirements.add(new Resource("grain"));
-        if(resources.containsAll(requirements) && Board.getDevCards().cards.size()>=1){
-            resources.removeAll(requirements);
-            playerDevCards.add(Board.getDevCards().cards.getFirst());
-            Board.removedevCards(0);
+        if(resources.containsAll(requirements) && Board.getPileDevCard().size()>=1){
+            for(Resource r:requirements)resources.remove(r);
+            playerDevCards.add(Board.getPileDevCard().getFirst());
+            Board.getPileDevCard().remove(0);
             System.out.println("you have bought dev card: "+playerDevCards.getLast().getType());}
         else{
             if(!resources.containsAll(requirements)){
@@ -77,30 +80,25 @@ public class Player {
     }
     public void useDevCard(devCard d){
         if(playerDevCards.contains(d)){
-            if(d.getType()=="knight") useKnight(1);
-            if(d.getType()=="year of plenty" )useYearPlenty(new Resource("brick"), new Resource("ore"));
-            if(d.getType()=="road building") useRoadBuilding(new Road(0,0,0),new Road(1,1,0));
-        }
-    }
-    public String getIp(){return ip;}
-    public void setIp(String ip){this.ip=ip;}
-    private void useRoadBuilding(Road r1, Road r2){
-        if(playerDevCards.contains(new devCard("road building"))&&false==playerDevCards.get(playerDevCards.indexOf(new devCard("road building"))).getUsed()){
-            addRoad(r1);
-            addRoad(r2);
-            playerDevCards.get(playerDevCards.indexOf(new devCard("road building"))).setUsed();
+            if(d.getType()=="knight") useKnight(d.gethexRobber());
+            if(d.getType()=="year of plenty" )useYearPlenty(d.getPlentyResources()[0], d.getPlentyResources()[1]);
+            if(d.getType()=="monopoly") useMonopoly(d.getResSteal());
+            if(d.getType()=="victory point") useVictoryPoint();
         }
     }
     private void useMonopoly(Resource catchRes){
         if(playerDevCards.contains(new devCard("monopoly"))&&false==playerDevCards.get(playerDevCards.indexOf(new devCard("monopoly"))).getUsed()){
-            /*change the init of player from main to board and catch the resource from board*/
-            int resourcesCatch=0;
             for(int i=0; i<Board.getPlayers().size(); i++){
-                while(Board.getPlayers().get(i).getResources().contains(catchRes)){
+                if(Board.getPlayers().get(i).getResources().contains(catchRes)){
+                    addResource(catchRes);
                     Board.getPlayers().get(i).getResources().remove(catchRes);
-                    resourcesCatch++;
-                }for(int d=0; d<resourcesCatch; d++){Board.getPlayers().get(number).addResource(catchRes);}
+                }
             }
+            for(int i=0; i<playerDevCards.size(); i++){
+                if(playerDevCards.get(i).getType()=="monopoly"&&playerDevCards.get(i).getUsed()==false){
+                    playerDevCards.get(i).setUsed();
+                    return;
+                }}
         }
     }
     private void useYearPlenty(Resource r1, Resource r2){
@@ -111,18 +109,28 @@ public class Player {
         }
     }
     private void useVictoryPoint(){
-        if(playerDevCards.contains(new devCard("victory point"))&&false==playerDevCards.get(playerDevCards.indexOf(new devCard("victory point"))).getUsed()){
-            allPoints++;
+        for(int k=0; k<playerDevCards.size(); k++){
+            if(playerDevCards.get(k).getType()=="victory point"&&playerDevCards.get(k).getUsed()==false){
             playerDevCards.get(playerDevCards.indexOf(new devCard("victory point"))).setUsed();
+            allPoints++;
+            System.out.println("real point: "+allPoints);
+            return;
         }
+    }
     }
     private void useKnight(int i){
-        if(playerDevCards.contains(new devCard("knight"))&&false==playerDevCards.get(playerDevCards.indexOf(new devCard("knight"))).getUsed()){
-            useRobber(i);
+        for(int k=0; k<playerDevCards.size(); k++){
+            if(playerDevCards.get(k).getType()=="knight"&&playerDevCards.get(k).getUsed()==false){
+            Board.useRobber(i);
             playerDevCards.get(playerDevCards.indexOf(new devCard("knight"))).setUsed();
-            System.out.println("you have used a knight");
+            System.out.println("you have used a knight in hexagon: "+i);
+            return;
         }
     }
+    }
+    
+    public String getIp(){return ip;}
+    public void setIp(String ip){this.ip=ip;}
     public void addResource(Resource resource){
         resources.add(resource);
         System.out.println(resources.size());}
@@ -130,12 +138,15 @@ public class Player {
         for(int i=0; i<r.size(); i++){
             resources.add(r.get(i));}}
     public ArrayList<Resource> getResources() {return resources;}
-    public void removeResource(ArrayList<Resource> r){resources.removeAll(r);}
+    public void removeResources(ArrayList<Resource> r){resources.removeAll(r);}
     public void addVillage(Village v) {
         villages.add(v);
     }
     public ArrayList<Road> getRoads() {
         return roads;
+    }
+    public void useRobber(int i){
+        Board.useRobber(i);
     }
     public void addRoad(Road r) {
         this.roads.add(new Road(r.getIndexHexagon(), r.getv1(), r.getv2()));
@@ -144,7 +155,6 @@ public class Player {
             System.out.println("true");
         }
     }
-    public void useRobber(int indexHexagon){Board.getHexagons().get(indexHexagon).setHasRobber(true);}
     public void addCity(City city) {
             Cities.add(new City(city.index, city.vertex, number));
             for(int i=0; i<villages.size(); i++){
@@ -175,9 +185,6 @@ public class Player {
             System.out.println(resources.size()+" "+resources.get(i).getType());
         }
         
-    }
-    public void addResourcebytype(String type){
-        resources.add(new Resource(type));
     }
     public int getAllpoints(){
         return allPoints;

@@ -9,6 +9,7 @@ import java.awt.FontMetrics;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
@@ -22,18 +23,22 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 //385
 public class Ui extends JPanel {
-
+    private JPanel UseDevCard = new JPanel();
     private static final int HEX_RADIUS = 50; // Radius of the getHexagons()
     private static final int X_SPACING = -15; // Spacing between getHexagons() horizontally
     private static final int Y_SPACING = 0;  // Spacing between rows of getHexagons()
     private static final int HEX_HEIGHT = 75; // Height of each hexagon
     private ArrayList<Point> centerPoints = new ArrayList<>();
+    private boolean useKnight = false;
+    private boolean useRobber = false;
+    private boolean useroadBuilding=false;
     private ArrayList<Point> OptionVillage = new ArrayList<>();
     private List<Line2D> roadLines=new ArrayList<>();
     private List<Line2D> PlacedRoadsLine=new ArrayList<>();
@@ -44,7 +49,8 @@ public class Ui extends JPanel {
     private Board board;
     private JLabel cubesJLabel = new JLabel();
     private JLabel playerPlayLabel;
-    private JFrame frame = new JFrame("CATAN");
+    private JFrame GameFrame = new JFrame("CATAN");
+    private JFrame DevCardMenu = new JFrame("Development Cards");
     private String ownIp="";
     private Village villageclicked;
     private List<Point> villagesToDraw=new ArrayList<>();
@@ -58,10 +64,10 @@ public class Ui extends JPanel {
     private List<Integer> roadsPlayersPlace=new ArrayList<>();
     Point[] fPoints = {
         new Point(45, 25), //fine
-        new Point(0, 50),
+        new Point(-3, 50),
         new Point(-45, 27), //fine
         new Point(-45, -27), //fine
-        new Point(0, -50),
+        new Point(-3, -50),
         new Point(45, -25) //fine
     };
     public Ui(Board board) {
@@ -163,7 +169,7 @@ public class Ui extends JPanel {
                 else if(roadsPlayersPlace.get(i)==2) g2d.setColor(new Color(207, 0, 0));
                 else if(roadsPlayersPlace.get(i)==3) g2d.setColor(new Color(21, 174, 171));
 
-                g2d.setStroke(new BasicStroke(4));
+                g2d.setStroke(new BasicStroke(6));
                 g2d.drawLine((int) line.getX1(), (int) line.getY1(), (int) line.getX2(), (int) line.getY2());
                 }
             }    
@@ -177,7 +183,7 @@ public class Ui extends JPanel {
                 else if(PermanatntRoadsPlayersPlace.get(i)==2) g2d.setColor(new Color(207, 0, 0));
                 else if(PermanatntRoadsPlayersPlace.get(i)==3) g2d.setColor(new Color(21, 174, 171));
 
-                g2d.setStroke(new BasicStroke(4));
+                g2d.setStroke(new BasicStroke(6));
                 g2d.drawLine((int) line.getX1(), (int) line.getY1(), (int) line.getX2(), (int) line.getY2());
                 }
             }    
@@ -199,22 +205,16 @@ public class Ui extends JPanel {
                 g2d.fillRect(ActualPoint.x-10, ActualPoint.y-10, 20, 20);
             }
         }
-        int num1 = 0;
-        while (num1 < 6) { // Replace 6 with your desired upper limit for num1
-            int num2 = 0;
-            while (num2 < 6) { // Replace 6 with your desired upper limit for num2
-                for (int i = 0; i < hexMiddlePoints.length - 1; i++) {
-                    if ((hexMiddlePoints[i].getX() + fPoints[num2].x) == (hexMiddlePoints[i + 1].getX() + fPoints[num1].x)&&(hexMiddlePoints[i].getY() + fPoints[num2].y) == (hexMiddlePoints[i + 1].getY() + fPoints[num1].y)) {
-                        board.getHexagons().get(i).vertices.get(num2).connectHexagon(i + 1, num1);
-                        //System.out.println("hexagon: " + i + ", vertex: " + num2 + " -> hexagon: " + (i + 1) + ", vertex: " + num1);
-                    }
-                    //System.out.println("debug: " + (hexMiddlePoints[i].getY() + fPoints[num2].y) + " -> " + (hexMiddlePoints[i + 1].getY() + fPoints[num1].y)+"| hexagon: " + i + ", vertex: " + num2 + " -> hexagon: " + (i + 1) + ", vertex: " + num1);
-                }
-                num2++;
+        for(int k=0; k<board.getPlayerPlay().playerDevCards.size(); k++){if(useKnight&&board.getPlayerPlay().playerDevCards.get(k).getType()==("knight")&&!board.getPlayerPlay().playerDevCards.get(k).getUsed()){
+            g2d.setColor(Color.BLACK);
+            for(Point i:hexMiddlePoints) g2d.fillOval(i.x-10, i.y+20, 20, 20);
+        }}
+        for(int i=0; i<board.getHexagons().size(); i++){
+            if(board.getHexagons().get(i).HasRobber()){
+                g2d.setColor(Color.BLACK);
+                g2d.fillOval(hexMiddlePoints[i].x-10, hexMiddlePoints[i].y+20, 20, 20);
             }
-            num1++;
         }
-        
    }
    
     
@@ -318,7 +318,7 @@ public class Ui extends JPanel {
     }
 
     private void buildVillage() {
-        if(board.getplayers().get(playerPlayNum(board.getPlayers())).getBuildRoad()==false&&board.getplayers().get(playerPlayNum(board.getPlayers())).getBuildCity()==false&&board.getplayers().get(playerPlayNum(board.getPlayers())).getBuildVillage()==true){
+        if(board.getPlayerPlay().getBuildRoad()==false&&board.getPlayerPlay().getBuildCity()==false&&board.getPlayerPlay().getBuildVillage()==true){
             int hexIndex=0;
             villagesPlayersPlace.clear();
             // Loop through each hexagon and its vertices
@@ -335,12 +335,12 @@ public class Ui extends JPanel {
                 }
             }
 
-            board.players.get(playerPlayNum(board.getPlayers())).setBuildVillage(true);
+            board.getPlayerPlay().setBuildVillage(true);
             repaint(); // Trigger a repaint to actually draw the colored vertices
         }
     }
     private void addVillage(Point clickPoint) {
-            if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getBuildVillage()){
+            if(board.getPlayerPlay().getBuildVillage()){
             OptionVillage.clear(); // Clear previous vertices if any
             int hexClicked = -1;
             int vertexClicked = -1;
@@ -349,7 +349,6 @@ public class Ui extends JPanel {
             for(int i=0; i<board.getHexagons().size(); i++){
                 if(hexMiddlePoints[i].x-55<=clickPoint.x && hexMiddlePoints[i].x+55>=clickPoint.x&&hexMiddlePoints[i].y-55<=clickPoint.y&&hexMiddlePoints[i].y+55>=clickPoint.y){
                     hexClicked=i;
-                    System.out.println("hex clicked: "+hexClicked);
                 }
             }
             if(hexClicked==-1){
@@ -376,12 +375,13 @@ public class Ui extends JPanel {
                 System.out.println("vertex 5");}
             System.out.println();
             villageclicked=new Village(hexClicked, vertexClicked,playerPlayNum(board.getPlayers()));
-            board.players.get(playerPlayNum(board.getPlayers())).villages.add(villageclicked);
+            board.getPlayerPlay().villages.add(villageclicked);
+            System.out.println("hex index:"+hexClicked);
             board.addVillageInHexagon(villageclicked);
             addVillageToDraw(villageclicked);
             repaint();
             
-            board.players.get(playerPlayNum(board.getPlayers())).setBuildVillage(false);
+            board.getPlayerPlay().setBuildVillage(false);
             }
     }
     private int playerPlayNum(ArrayList<Player> getPlayers) {
@@ -405,7 +405,7 @@ public class Ui extends JPanel {
         timer.setRepeats(false); // Only execute once
         timer.start(); // Start the timer
     }
-    private int randomDie(){    
+    private int RandomDice(){    
         ArrayList<Integer> Cube1=new ArrayList<>();
         for(int i=1; i<6; i++){Cube1.add(i);}
         Collections.shuffle(Cube1);
@@ -415,21 +415,24 @@ public class Ui extends JPanel {
     }
 
     private void BuildRoad() {
-        if(board.getplayers().get(playerPlayNum(board.getPlayers())).getBuildCity()==false&&board.getplayers().get(playerPlayNum(board.getPlayers())).getBuildVillage()==false){
+        if(board.getPlayerPlay().getBuildCity()==false&&board.getPlayerPlay().getBuildVillage()==false&&board.getPlayerPlay().getBuildRoad()==false){
             for (int i = 0; i < hexMiddlePoints.length; i++) {
                 for (int k = 0; k < fPoints.length; k++) {
                     if(board.getHexagons().get(i).vertices.get(k).getVillage()||board.getHexagons().get(i).vertices.get((k+1)%6).getVillage()||board.getHexagons().get(i).vertices.get(k).getCity()||board.getHexagons().get(i).vertices.get((k+1)%6).getCity()){
+
                         roadLines.add(new Line2D.Float(
                             hexMiddlePoints[i].x + fPoints[k].x, hexMiddlePoints[i].y + fPoints[k].y,
                             hexMiddlePoints[i].x + fPoints[(k + 1) % 6].x, hexMiddlePoints[i].y + fPoints[(k + 1) % 6].y
                         ));
                         roadsDrawed.add(new Road(i, k, (k + 1) % 6));
                         roadsPlayersPlace.add(playerPlayNum(board.getPlayers()));
-                        board.players.get(playerPlayNum(board.getPlayers())).setBuildRoad(true);
+                        board.getPlayerPlay().setBuildRoad(true);
                     }
                 }
             }
-            repaint();
+            board.getPlayerPlay().resources.remove(new Resource("brick"));
+            board.getPlayerPlay().resources.remove(new Resource("lumber"));
+            GameFrame.repaint();
         }
 
     }
@@ -443,16 +446,7 @@ public class Ui extends JPanel {
                     System.out.println("actual road:"+(hexMiddlePoints[actualRoad.getIndexHexagon()].y + fPoints[actualRoad.getv1()].y)+" "+p.y);
                     if(hexMiddlePoints[actualRoad.getIndexHexagon()].y + fPoints[actualRoad.getv1()].y<=p.y&&hexMiddlePoints[actualRoad.getIndexHexagon()].y + fPoints[actualRoad.getv2()].y>=p.y){
                         System.out.println("hexindex of road :"+actualRoad.getIndexHexagon()+" v1: "+actualRoad.getv1()+" v2: "+actualRoad.getv2());
-                        
-                        PlacedRoadsLine.add(new Line2D.Float(
-                            hexMiddlePoints[actualRoad.getIndexHexagon()].x + fPoints[actualRoad.getv1()].x, hexMiddlePoints[actualRoad.getIndexHexagon()].y + fPoints[actualRoad.getv1()].y,
-                            hexMiddlePoints[actualRoad.getIndexHexagon()].x + fPoints[actualRoad.getv2()].x, hexMiddlePoints[actualRoad.getIndexHexagon()].y + fPoints[actualRoad.getv2()].y
-                        ));
-                        PermanatntRoadsPlayersPlace.add(playerPlayNum(board.getPlayers()));
-                        roadLines.clear();
-                        roadsDrawed.clear();
-                        roadsPlayersPlace.clear();
-                        roadsPlayersPlace.add(playerPlayNum(board.getPlayers()));
+                        drawRoad(actualRoad);
                         board.addRoad(actualRoad);
                     }
                 }
@@ -461,19 +455,35 @@ public class Ui extends JPanel {
 
         }
         repaint();
-        board.players.get(playerPlayNum(board.getPlayers())).setBuildRoad(false);
+        board.getPlayerPlay().setBuildRoad(false);
+        System.out.println("enter"+useroadBuilding);
+        if(useroadBuilding){BuildRoad();
+        System.out.println("enter");
+        useroadBuilding=false;}
+    }
+    private void drawRoad(Road actualRoad){
+        PlacedRoadsLine.add(new Line2D.Float(
+            hexMiddlePoints[actualRoad.getIndexHexagon()].x + fPoints[actualRoad.getv1()].x, hexMiddlePoints[actualRoad.getIndexHexagon()].y + fPoints[actualRoad.getv1()].y,
+            hexMiddlePoints[actualRoad.getIndexHexagon()].x + fPoints[actualRoad.getv2()].x, hexMiddlePoints[actualRoad.getIndexHexagon()].y + fPoints[actualRoad.getv2()].y
+        ));
+        PermanatntRoadsPlayersPlace.add(playerPlayNum(board.getPlayers()));
+        roadLines.clear();
+        roadsDrawed.clear();
+        roadsPlayersPlace.clear();
+        roadsPlayersPlace.add(playerPlayNum(board.getPlayers()));
+        GameFrame.repaint();
     }
     private void buildCity(){
         int graincount=0;
         int orecount=0;
-        for(Resource r:board.getPlayers().get(playerPlayNum(board.getPlayers())).getResources()){if(r.getType().equals("grain")) graincount++;
+        for(Resource r:board.getPlayerPlay().getResources()){if(r.getType().equals("grain")) graincount++;
             if(r.getType().equals("ore")) orecount++;}
         if(graincount>=2&&orecount>=3){
-            if(board.getplayers().get(playerPlayNum(board.getPlayers())).getBuildRoad()==false&&board.getplayers().get(playerPlayNum(board.getPlayers())).getBuildVillage()==false){
+            if(board.getPlayerPlay().getBuildRoad()==false&&board.getPlayerPlay().getBuildVillage()==false){
                 for(int i=0; i<board.getHexagons().size(); i++){
                     for(int k=0; k<board.getHexagons().get(i).getVertices().size(); k++){
                         if(board.getHexagons().get(i).getVertex(k).getVillage()){
-                            for(Village v:board.getplayers().get(playerPlayNum(board.getPlayers())).getVillages()){
+                            for(Village v:board.getPlayerPlay().getVillages()){
                                 if(v.index==i&&v.getVertex()==k){
                                     CityToDraw.add(new Point(hexMiddlePoints[i].x+fPoints[k].x, hexMiddlePoints[i].y+fPoints[k].y));
                                     CitysPlayersPlace.add(playerPlayNum(board.getPlayers()));
@@ -482,7 +492,7 @@ public class Ui extends JPanel {
                         }
                     }
                 }
-                board.players.get(playerPlayNum(board.getPlayers())).setBuildCity(true);
+                board.getPlayerPlay().setBuildCity(true);
                 repaint();
             }
         }
@@ -501,20 +511,160 @@ public class Ui extends JPanel {
             }
         }
 
-        board.players.get(playerPlayNum(board.getPlayers())).setBuildCity(false);
+        board.getPlayerPlay().setBuildCity(false);
         repaint();
 
     }
+    private void useKnight(Point p){
+        for(int i=0; i<hexMiddlePoints.length; i++){
+            if(hexMiddlePoints[i].x-20<=p.x&&hexMiddlePoints[i].x>=p.x&&hexMiddlePoints[i].y+20<=p.y&&hexMiddlePoints[i].y+40>=p.y){
+                devCard d=new devCard("knight");
+                d.setKnight(i);
+                board.getPlayerPlay().useDevCard(d);
+                for(HexagonResource h:board.getHexagons()){
+                    if(h.HasRobber()){
+                        System.out.println("hexagon with robber: "+h.getIndex());
+                    }
+                }
+                useKnight=false;
+                for(int k=0; k<board.getPlayerPlay().playerDevCards.size(); k++){
+                    System.out.println(k+" "+board.getPlayerPlay().playerDevCards.get(k).getType()+" "+board.getPlayerPlay().playerDevCards.get(k).getUsed());
+                }
+            }
+        }
+        DevCardMenu.repaint();
+        GameFrame.repaint();
+    }
+    private void useRobber(Point p){
+        for(int i=0; i<hexMiddlePoints.length; i++){
+            if(hexMiddlePoints[i].x-20<=p.x&&hexMiddlePoints[i].x>=p.x&&hexMiddlePoints[i].y+20<=p.y&&hexMiddlePoints[i].y+40>=p.y){
+                board.getPlayerPlay().useRobber(i);
+                useRobber=false;
+            }
+        }
+        GameFrame.repaint();
+    }
+private Resource ResourceSelect() {
+    Resource ResSelected = new Resource("null");
+
+    JDialog ResSelect = new JDialog((JFrame) null, "Select a resource", true); // Modal dialog
+    ResSelect.setSize(400, 100);
+    ResSelect.setLayout(new GridLayout(1, 5));
+
+    List<JButton> ResButtons = new ArrayList<>();
+    String[] resources = {"grain", "lumber", "wool", "brick", "ore"};
+
+    for (String res : resources) {
+        JButton button = new JButton(res);
+        button.addActionListener(e -> {
+            ResSelected.setType(res);
+            ResSelect.dispose(); // Close the dialog after selecting
+        });
+
+        button.setBackground(getResourceColor(res));
+        ResButtons.add(button);
+        ResSelect.add(button);
+    }
+
+    ResSelect.setLocationRelativeTo(null);
+    ResSelect.setVisible(true);
+
+    return ResSelected;
+}
+  
+    private void updateDevCardButtons() {
+        UseDevCard.removeAll(); // Clear previous buttons
+        int knightCount = 0,VictoryPointCount=0,monopolyCount=0, yearOfPlentyCount=0,roadBuildingCount=0;
+        for (devCard card : board.getPlayerPlay().playerDevCards) {
+            if (card.getType()=="knight" && !card.getUsed()) {
+                knightCount++;
+            }
+        }
+        if (knightCount > 0) {
+            JButton KnightButton = createStyledButton("knight: " + knightCount);
+            KnightButton.addActionListener(e -> {
+                useKnight = true;
+                updateDevCardButtons(); // Refresh knights after use
+                GameFrame.repaint();
+            });
+            UseDevCard.add(KnightButton);}
+        for (devCard card : board.getPlayerPlay().playerDevCards) {
+            if (card.getType()=="victory point" && !card.getUsed()) {
+                VictoryPointCount++;
+            }
+        }
+        if (VictoryPointCount > 0) {
+            JButton VictoryPointButton = createStyledButton("victory point: " + VictoryPointCount);
+            VictoryPointButton.setPreferredSize(new Dimension(200, 40)); // Set width and height
+            VictoryPointButton.addActionListener(e -> {
+                board.getPlayerPlay().useDevCard(new devCard("victory point"));
+                updateDevCardButtons(); // Refresh buttons after use
+                GameFrame.repaint();
+            });
+            UseDevCard.add(VictoryPointButton);
+        }
+        for (devCard card : board.getPlayerPlay().playerDevCards) {
+            if (card.getType()=="monopoly" && !card.getUsed()) {
+                monopolyCount++;
+            }
+        }
+        if (monopolyCount > 0) {
+            JButton MonopolyButton = createStyledButton("monopoly: " + monopolyCount);
+            MonopolyButton.setPreferredSize(new Dimension(150, 40)); // Set width and height
+            MonopolyButton.addActionListener(e -> {
+                devCard monopolyCard = new devCard("monopoly");
+                monopolyCard.setResSteal(ResourceSelect());
+                board.getPlayerPlay().useDevCard(monopolyCard);
+                updateDevCardButtons();
+                GameFrame.repaint();
+            });
+            UseDevCard.add(MonopolyButton);
+        }
+        for (devCard card : board.getPlayerPlay().playerDevCards) {
+            if (card.getType()=="year of plenty" && !card.getUsed()) {
+                yearOfPlentyCount++;
+            }
+        }
+        if (yearOfPlentyCount > 0) {
+            JButton yearOfPlentyButton = createStyledButton("year of plenty: " + yearOfPlentyCount);
+            yearOfPlentyButton.setPreferredSize(new Dimension(180, 40)); // Set width and height
+            yearOfPlentyButton.addActionListener(e -> {
+                devCard d = new devCard("year of plenty");
+                d.setPlentyResources(ResourceSelect(), ResourceSelect());
+                board.getPlayerPlay().useDevCard(d);
+                updateDevCardButtons();
+                GameFrame.repaint();
+            });
+            UseDevCard.add(yearOfPlentyButton);
+        }
+        
+        for (devCard card : board.getPlayerPlay().playerDevCards) {
+            if (card.getType()=="road building" && !card.getUsed()) {
+                roadBuildingCount++;
+            }
+        }
+        if (roadBuildingCount > 0) {
+            JButton roadBuildingButton = createStyledButton("road building: " + roadBuildingCount);
+            roadBuildingButton.setPreferredSize(new Dimension(180, 40)); // Set width and height
+            roadBuildingButton.addActionListener(e -> {
+                board.getPlayerPlay().getPlayerDevCards().get(board.getPlayerPlay().getPlayerDevCards().indexOf(new devCard("road building"))).setUsed();
+                useroadBuilding=true;
+                BuildRoad();
+                
+
+                updateDevCardButtons();
+                GameFrame.repaint();
+            });
+            UseDevCard.add(roadBuildingButton);
+        }
+        // Refresh UI
+        UseDevCard.revalidate();
+        UseDevCard.repaint();
+    }
+        
     private void setupUI() {
-        // Code to initialize the UI
-        
-        //create the connected vertices:
         hexMiddlePoints = new Point[board.getHexagons().size()];
-        //end create the connected vertices.
         this.setBackground(new Color(14, 150, 212));
-        
-        System.out.println();
-        // Set the layout for custom button placement
         this.setLayout(null);
         // Create a panel for the right-side menu with a background color
         JPanel rightPanel = new JPanel();
@@ -540,9 +690,9 @@ public class Ui extends JPanel {
         JButton villageButton = createStyledButton("Village");
         JButton cityButton = createStyledButton("City");
         JButton roadButton = createStyledButton("Road");
-        JButton buyDevcardButton = createStyledButton("Dev card");
+        JButton DevCardManagerButton = createStyledButton("Dev card");
         // Add buttons to the panel
-        rightPanel.add(buyDevcardButton);
+        rightPanel.add(DevCardManagerButton);
         rightPanel.add(villageButton);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         rightPanel.add(cityButton);
@@ -561,19 +711,19 @@ public class Ui extends JPanel {
         villageButton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
-                if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp){
-                    if(board.players.get(playerPlayNum(board.getPlayers())).getVillages().size()<2){
-                        board.players.get(playerPlayNum(board.getPlayers())).setBuildVillage(true);
+                if(board.getPlayerPlay().getIp()==ownIp){
+                    if(board.getPlayerPlay().getVillages().size()<2){
+                        board.getPlayerPlay().setBuildVillage(true);
                         buildVillage();
                     }
                     else{
-                        if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("grain"))){colorResourceAsRed(resourceCircles.get(0));}
-                        if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("brick"))){colorResourceAsRed(resourceCircles.get(3));}
-                        if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("lumber"))){colorResourceAsRed(resourceCircles.get(4));}
-                        if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("wool"))){colorResourceAsRed(resourceCircles.get(1));}
+                        if(!board.getPlayerPlay().resources.contains(new Resource("grain"))){colorResourceAsRed(resourceCircles.get(0));}
+                        if(!board.getPlayerPlay().resources.contains(new Resource("brick"))){colorResourceAsRed(resourceCircles.get(3));}
+                        if(!board.getPlayerPlay().resources.contains(new Resource("lumber"))){colorResourceAsRed(resourceCircles.get(4));}
+                        if(!board.getPlayerPlay().resources.contains(new Resource("wool"))){colorResourceAsRed(resourceCircles.get(1));}
                         else{
                             buildVillage();
-                            System.out.println("player: "+playerPlayNum(board.getPlayers())+" villages: "+board.players.get(playerPlayNum(board.getPlayers())).villages.size());
+                            System.out.println("player: "+playerPlayNum(board.getPlayers())+" villages: "+board.getPlayerPlay().villages.size());
                         }
                     }
             }
@@ -584,10 +734,10 @@ public class Ui extends JPanel {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
 
-                if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp){
-                if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("brick"))){colorResourceAsRed(resourceCircles.get(3));}
-                if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("lumber"))){colorResourceAsRed(resourceCircles.get(4));}
-                if(board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("lumber"))&&board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("brick"))){
+                if(board.getPlayerPlay().getIp()==ownIp){
+                if(!board.getPlayerPlay().resources.contains(new Resource("brick"))){colorResourceAsRed(resourceCircles.get(3));}
+                if(!board.getPlayerPlay().resources.contains(new Resource("lumber"))){colorResourceAsRed(resourceCircles.get(4));}
+                if(board.getPlayerPlay().resources.contains(new Resource("lumber"))&&board.getPlayerPlay().resources.contains(new Resource("brick"))){
                     BuildRoad();
                 }
             }
@@ -597,9 +747,9 @@ public class Ui extends JPanel {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
 
-                if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp){
+                if(board.getPlayerPlay().getIp()==ownIp){
                 // Retrieve the current player's resources
-                ArrayList<Resource> resources = board.getPlayers().get(playerPlayNum(board.getPlayers())).resources;
+                ArrayList<Resource> resources = board.getPlayerPlay().resources;
                 
                 // Count the occurrences of "grain" and "ore" in the resources list
                 long grainCount = resources.stream().filter(r -> r.equals(new Resource("grain"))).count();
@@ -617,17 +767,56 @@ public class Ui extends JPanel {
             }
             }
         });
-        buyDevcardButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("grain"))){colorResourceAsRed(resourceCircles.get(0));}
-                if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("ore"))){colorResourceAsRed(resourceCircles.get(2));}
-                if(!board.getPlayers().get(playerPlayNum(board.getPlayers())).resources.contains(new Resource("wool"))){colorResourceAsRed(resourceCircles.get(1));}
-                board.getPlayers().get(playerPlayNum(board.getPlayers())).buyDevCard();
-                rightPanel.repaint();
-            }
+
+        UseDevCard.setLayout(new FlowLayout()); // Make sure buttons are placed correctly
+
+        DevCardManagerButton.addMouseListener(new java.awt.event.MouseAdapter() {
+    @Override
+    public void mousePressed(java.awt.event.MouseEvent evt) {
+        // Clear previous buttons from UseDevCard
+        UseDevCard.removeAll();
+        
+        if (!board.getPlayerPlay().resources.contains(new Resource("grain"))) {
+            colorResourceAsRed(resourceCircles.get(0));
+        }
+        if (!board.getPlayerPlay().resources.contains(new Resource("ore"))) {
+            colorResourceAsRed(resourceCircles.get(2));
+        }
+        if (!board.getPlayerPlay().resources.contains(new Resource("wool"))) {
+            colorResourceAsRed(resourceCircles.get(1));
+        }
+
+        if (board.getPlayerPlay().resources.contains(new Resource("grain")) &&
+            board.getPlayerPlay().resources.contains(new Resource("ore")) &&
+            board.getPlayerPlay().resources.contains(new Resource("wool"))) {
+            
+            DevCardMenu.setSize(500, 300);
+            DevCardMenu.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            DevCardMenu.setLayout(null); 
+
+            JButton buyDevCard = createStyledButton("Buy Dev Card");
+
+            // Position UseDevCard panel
+            UseDevCard.setBounds(180, 20, 150, 250);
+            DevCardMenu.add(UseDevCard); // Add it once
+
+            updateDevCardButtons(); // Check and update knights dynamically
+
+            // Buy Dev Card Button
+            buyDevCard.setBounds(20, 20, 150, 30);
+            buyDevCard.addActionListener(e -> {
+                board.buyDevCard(playerPlayNum(board.getPlayers())); 
+                updateDevCardButtons(); // Refresh dev cards after buying
+                GameFrame.repaint();
+            });
+
+            DevCardMenu.add(buyDevCard);
+            DevCardMenu.setVisible(true);
+            DevCardMenu.repaint();
+        }
+    }
         });
-        JButton endTurnButton = createStyledButton("End My Turn");
+JButton endTurnButton = createStyledButton("End My Turn");
         endTurnButton.setPreferredSize(new Dimension(120, 40));
         endTurnButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -640,8 +829,7 @@ public class Ui extends JPanel {
         endTurnButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                    
-                    if(board.getplayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp&&board.players.get(playerPlayNum(board.getPlayers())).getDiceTurned()==true&&board.players.get(playerPlayNum(board.getPlayers())).getBuildVillage()==false&&board.players.get(playerPlayNum(board.getPlayers())).getBuildRoad()==false){
+                    if(board.getPlayerPlay().getIp()==ownIp&&board.getPlayerPlay().getDiceTurned()==true&&board.getPlayerPlay().getBuildVillage()==false&&board.getPlayerPlay().getBuildRoad()==false){
                     
                     if(playerPlayNum(board.getPlayers())+1==board.getPlayers().size()){
                         board.players.get(board.getPlayers().size()-1).setPlayerPlay(false);
@@ -654,7 +842,7 @@ public class Ui extends JPanel {
                     System.out.println("Turn Ended "+(playerPlayNum(board.getPlayers())+1));
                     playerPlayLabel.setText("Player play: " + (playerPlayNum(board.getPlayers())+1));
                     System.out.println("Player play by ui: " + (playerPlayNum(board.getPlayers())+1));
-                    board.players.get(playerPlayNum(board.getPlayers())).setDiceTurned(false);
+                    board.getPlayerPlay().setDiceTurned(false);
                     repaint();
                 }
             }
@@ -662,38 +850,45 @@ public class Ui extends JPanel {
 //
         cubesJLabel.setFont(new Font("Arial", Font.BOLD, 17));
         cubesJLabel.setForeground(Color.WHITE);
-        cubesJLabel.setText("the sum of the dice: NULL");
-        JButton rollDie = createStyledButton("Roll a die");
-        rollDie.setPreferredSize(new Dimension(120, 40));
-        rollDie.setAlignmentX(Component.CENTER_ALIGNMENT);
+        cubesJLabel.setText("the sum of the dice: 0");
+        JButton RollDice = createStyledButton("Roll Dice");
+        RollDice.setPreferredSize(new Dimension(120, 40));
+        RollDice.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Align to the bottom with padding
         rightPanel.add(Box.createVerticalGlue()); // Pushes the button to the bottom
-        rightPanel.add(rollDie);
+        rightPanel.add(RollDice);
         rightPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         // Set an action for the "End My Turn" button
-        rollDie.addActionListener(new ActionListener() {
+        RollDice.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(board.getplayers().get(playerPlayNum(board.getPlayers())).getIp()==ownIp&&board.players.get(playerPlayNum(board.players)).getDiceTurned()==false){
-
-                sumDice=randomDie();
-                board.setSumDice(sumDice);
-                cubesJLabel.setText("the sum of the dice:"+sumDice);
-                rightPanel.repaint();
-                board.players.get(playerPlayNum(board.getPlayers())).setDiceTurned(true);
+                if(board.getPlayerPlay().getIp()==ownIp&&board.getPlayerPlay().getDiceTurned()==false&&board.getPlayerPlay().getBuildVillage()==false&&board.getPlayerPlay().getBuildRoad()==false){
+                    sumDice=RandomDice();
+                    board.setSumDice(sumDice);
+                    cubesJLabel.setText("the sum of the dice:"+sumDice);
+                    rightPanel.repaint();
+                    board.getPlayerPlay().setDiceTurned(true);
+                    if(sumDice==7){
+                        useRobber=true;
+                        GameFrame.repaint();
+                    }
+                    board.addResourceByDice(sumDice);
+                    repaint();
+                }
             }
-        }
         });
 //
 // Add a mouse listener to detect when a vertex is clicked to clear the color
         this.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {
-                if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getBuildVillage()) addVillage(evt.getPoint());
-                else if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getBuildRoad()) addRoad(evt.getPoint());
-                else if(board.getPlayers().get(playerPlayNum(board.getPlayers())).getBuildCity()) addCity(evt.getPoint());
+                if(board.getPlayerPlay().getBuildVillage()) addVillage(evt.getPoint());
+                else if(board.getPlayerPlay().getBuildRoad()) addRoad(evt.getPoint());
+                else if(board.getPlayerPlay().getBuildCity()) addCity(evt.getPoint());
+                else if(useKnight) useKnight(evt.getPoint());
+                else if(useRobber) useRobber(evt.getPoint());
             }});
         // Panel and button setup
         rightPanel.setLayout(null); // Set layout to null for absolute positioning
@@ -714,14 +909,14 @@ public class Ui extends JPanel {
         roadButton.setBounds(20, 140, 120, 45); // Positioned below "Village" button
         rightPanel.add(roadButton);
 // Buy dev card button
-        buyDevcardButton.setBounds(150, 140, 120, 45);
-        rightPanel.add(buyDevcardButton);
+        DevCardManagerButton.setBounds(150, 140, 120, 45);
+        rightPanel.add(DevCardManagerButton);
 // End Turn Button
         endTurnButton.setBounds(140, 515, 150, 40); // Positioned at the bottom center
         rightPanel.add(endTurnButton);
-// Roll a die Button
-        rollDie.setBounds(10, 515, 120, 40); // Positioned at the bottom center
-        rightPanel.add(rollDie);
+// Roll a dice Button
+        RollDice.setBounds(10, 515, 120, 40); // Positioned at the bottom center
+        rightPanel.add(RollDice);
 
         playerPlayLabel.setBounds(90, -5, 200, 40); // Adjust position and size as needed
         rightPanel.add(playerPlayLabel);
@@ -762,7 +957,7 @@ public class Ui extends JPanel {
 
                     // Count the resource quantity
                     int resourceCount = 0;
-                    for (Resource res : board.getPlayers().get(playerPlayNum(board.getPlayers())).resources) {
+                    for (Resource res : board.getPlayerPlay().resources) {
                         if (res.getType().equalsIgnoreCase(finalResourceType)) {
                             resourceCount++;
                         }
@@ -800,31 +995,48 @@ public class Ui extends JPanel {
         });
 
         // Set frame properties and add components
-        frame.setLayout(new BorderLayout());
-        frame.add(this, BorderLayout.CENTER); // Add the hexagon drawing panel
-        frame.add(rightPanel, BorderLayout.EAST); // Add the right panel with buttons
-        frame.setSize(1000, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        GameFrame.setLayout(new BorderLayout());
+        GameFrame.add(this, BorderLayout.CENTER); // Add the hexagon drawing panel
+        GameFrame.add(rightPanel, BorderLayout.EAST); // Add the right panel with buttons
+        GameFrame.setSize(1000, 600);
+        GameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        GameFrame.setVisible(true);
     }
     private void addVillageToDraw(Village village){
         Point vertex = new Point(hexMiddlePoints[village.index].x+fPoints[village.getVertex()].x, hexMiddlePoints[village.index].y+fPoints[village.getVertex()].y);
         villagesPlayersTOdraw.add(playerPlayNum(board.getPlayers()));
         villagesToDraw.add(vertex);
     }
-    private void addCityToDraw(City city){
-
-        FinnalyPlaccedCity.add(new Point(hexMiddlePoints[city.index].x+fPoints[city.vertex].x, hexMiddlePoints[city.index].y+fPoints[city.vertex].y));
-        villagesToDraw.remove(new Point(hexMiddlePoints[city.index].x+fPoints[city.vertex].x, hexMiddlePoints[city.index].y+fPoints[city.vertex].y));
-        villagesPlayersTOdraw.remove(playerPlayNum(board.getPlayers()));
-        CitysPlayersPlace.add(playerPlayNum(board.getPlayers()));
+    private void addCityToDraw(City city) {
+        if (city.index >= hexMiddlePoints.length || city.vertex >= fPoints.length) {
+            System.out.println("Invalid indices: city.index=" + city.index + ", city.vertex=" + city.vertex);
+            return;
+        }
+        
+        Point cityPoint = new Point(hexMiddlePoints[city.index].x + fPoints[city.vertex].x,
+                                    hexMiddlePoints[city.index].y + fPoints[city.vertex].y);
+        FinnalyPlaccedCity.add(cityPoint);
+        
+        if (villagesToDraw.contains(cityPoint)) {
+            villagesToDraw.remove(cityPoint);
+        } else {
+            System.out.println("Warning: Point not found in villagesToDraw: " + cityPoint);
+        }
+        
+        int playerNum = playerPlayNum(board.getPlayers());
+        if (villagesPlayersTOdraw.contains(playerNum)) {
+            villagesPlayersTOdraw.remove(Integer.valueOf(playerNum));
+        } else {
+            System.out.println("Warning: Player number not found in villagesPlayersTOdraw: " + playerNum);
+        }
+        
+        CitysPlayersPlace.add(playerNum);
     }
     public void updateAll(Board board){
         this.board=board;
         this.sumDice=board.getSumDice();
         this.playerPlayLabel.setText("Player play: " + (playerPlayNum(board.getPlayers())+1));
         this.cubesJLabel.setText("the sum of the dice: "+sumDice);
-        
         for(int k=0; k<board.getHexagons().size(); k++){
             for(int j=0; j<board.getHexagons().get(k).getVertices().size(); j++){
                 if(board.getHexagons().get(k).getVertices().get(j).getVillage()){
@@ -833,9 +1045,17 @@ public class Ui extends JPanel {
                 if(board.getHexagons().get(k).getVertices().get(j).getCity()){
                     addCityToDraw(new City(k, j, playerPlayNum(board.getPlayers())));
                 }
-                //System.out.println("hexagon: "+k+", vertex: "+j+" -> village: "+board.getHexagons().get(k).getVertices().get(j).getVillage());
+                if(board.getHexagons().get(k).getVertices().get(j).getRoad()){
+                    if(j==5){if(board.getHexagons().get(k).getVertices().get(j).getRoad()&&board.getHexagons().get(k).getVertices().get(0).getRoad()){
+                        drawRoad(new Road(k, j, 0));
+                    }}
+                    
+                    else if(board.getHexagons().get(k).getVertices().get(j).getRoad()&&board.getHexagons().get(k).getVertices().get(j+1).getRoad()){
+                        System.out.println("entger");
+                        drawRoad(new Road(k, j, j+1));}
+                }
             }
         }
-        this.frame.repaint();
+        this.GameFrame.repaint();
     }
 }

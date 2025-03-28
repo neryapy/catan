@@ -7,7 +7,6 @@ public class HexagonResource implements Comparable<HexagonResource> {
     private int number;
     private int index;
     public List<vertex> vertices;
-    private List<lineHexagon> lines;
     private boolean hasRobber=false;
 
     public HexagonResource(String resourceType, int number, int index) {
@@ -16,19 +15,10 @@ public class HexagonResource implements Comparable<HexagonResource> {
         this.index = index;
         this.vertices = new ArrayList<>();
         initializeVertices();
-        this.lines= new ArrayList<>();
-        initializelines();
     }
-    public boolean isHasRobber() {return hasRobber;}
+    public boolean HasRobber() {return hasRobber;}
+    public void setRobber(boolean hasRobber) {this.hasRobber = hasRobber;}
 
-    public void setHasRobber(boolean hasRobber) {this.hasRobber = hasRobber;}
-
-    private void initializelines() {
-        for (int i = 0; i < 6; i++) { // Hexagon has 6 vertices
-            lineHexagon l = new lineHexagon(i);
-            lines.add(l);
-        }
-    }
     private void initializeVertices() {
         for (int i = 0; i < 6; i++) { // Hexagon has 6 vertices
             vertex v = new vertex(i);
@@ -37,10 +27,6 @@ public class HexagonResource implements Comparable<HexagonResource> {
     }
     public int getIndex() {
         return index;
-    }
-
-    public List<lineHexagon> getLines() {
-        return lines;
     }
     public void setNumber(int number){
         this.number=number;

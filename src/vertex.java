@@ -1,14 +1,14 @@
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.ArrayList;
+import java.util.List;
 public class vertex {
     private int index;
     private boolean village;
     private boolean city;
-    private Boolean road;
-    HashMap<Integer, Integer> connectedHexagons = new HashMap<Integer, Integer>();
-    private vertex vertexPoint;
+    private Boolean road=false;
+    private List<Integer> CoonectedVertices=new ArrayList<>();
+    
+    private List<Integer> CoonectedHexagons=new ArrayList<>();
     public vertex(int index) {
         this.index = index;
         this.village=false;
@@ -16,6 +16,12 @@ public class vertex {
     }
     public void setRoad(Boolean road) {
         this.road = road;
+    }
+    public List<Integer> getCoonectedVertices(){
+        return CoonectedVertices;
+    }    
+    public List<Integer> getCoonectedHexagons(){
+        return CoonectedHexagons;
     }
     public Boolean getRoad() {
         return road;
@@ -37,12 +43,5 @@ public class vertex {
 
     public void setCity(boolean city) {
         this.city = city;
-    }
-    public void connectHexagon(int hexIndex, int vertexIndex) {
-        connectedHexagons.put(hexIndex, vertexIndex);
-    }
-
-    public Map<Integer, Integer> getConnectedHexagons() {
-        return connectedHexagons;
     }
 }

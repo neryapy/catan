@@ -11,7 +11,9 @@ public class Resource {
         Resource resource = (Resource) o;
         return type.equals(resource.type);
     }
-
+    public void setType(String type) {
+        this.type = type;
+    }
     @Override
     public int hashCode() {
         return type.hashCode();

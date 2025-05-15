@@ -1,0 +1,38 @@
+Date : 2025-05-02 18:09:51
+Directory : c:\prog\workspace java\catan\src
+Total : 14 files,  2358 codes, 87 comments, 229 blanks, all 2674 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Java     |         14 |      2,358 |         87 |        229 |      2,674 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                  | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                     |         14 |      2,358 |         87 |        229 |      2,674 |
++-------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                              | language | code       | comment    | blank      | total      |
++-------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\prog\workspace java\catan\src\Board.java           | Java     |        216 |          7 |         11 |        234 |
+| c:\prog\workspace java\catan\src\City.java            | Java     |         24 |          0 |          1 |         25 |
+| c:\prog\workspace java\catan\src\Client.java          | Java     |        120 |          1 |         10 |        131 |
+| c:\prog\workspace java\catan\src\HexagonResource.java | Java     |         63 |          0 |          7 |         70 |
+| c:\prog\workspace java\catan\src\Main.java            | Java     |         27 |          3 |          6 |         36 |
+| c:\prog\workspace java\catan\src\PartyManager.java    | Java     |        145 |          0 |         32 |        177 |
+| c:\prog\workspace java\catan\src\Player.java          | Java     |        240 |          0 |         10 |        250 |
+| c:\prog\workspace java\catan\src\Resource.java        | Java     |         26 |          0 |          8 |         34 |
+| c:\prog\workspace java\catan\src\Road.java            | Java     |         23 |          0 |          2 |         25 |
+| c:\prog\workspace java\catan\src\Ui.java              | Java     |      1,244 |         76 |        123 |      1,443 |
+| c:\prog\workspace java\catan\src\Village.java         | Java     |         24 |          0 |          2 |         26 |
+| c:\prog\workspace java\catan\src\devCard.java         | Java     |         35 |          0 |          3 |         38 |
+| c:\prog\workspace java\catan\src\host.java            | Java     |        127 |          0 |          9 |        136 |
+| c:\prog\workspace java\catan\src\vertex.java          | Java     |         44 |          0 |          5 |         49 |
+| Total                                                 |          |      2,358 |         87 |        229 |      2,674 |
++-------------------------------------------------------+----------+------------+------------+------------+------------+

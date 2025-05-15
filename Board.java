@@ -263,6 +263,7 @@ public class Board implements Serializable {
                     for(int cih:hexagons.get(city.getIndex()).vertices.get(city.getVertex()).getCoonectedHexagons()){
                         if(!hexagons.get(cih).HasRobber()&&hexagons.get(cih).getNumber()==diceSum){
                             players.get(player.getNumber()).addResource(new Resource(hexagons.get(cih).getResourceType()));
+                            players.get(player.getNumber()).addResource(new Resource(hexagons.get(cih).getResourceType()));
                         }
                     }
                 }

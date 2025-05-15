@@ -340,6 +340,7 @@ public class Ui extends JPanel{
     }
 
     private void buildVillage() {
+        System.out.println(board.getPlayerPlay().getBuildRoad()+" "+board.getPlayerPlay().getBuildCity()+" "+board.getPlayerPlay().getBuildVillage());
         if(board.getPlayerPlay().getBuildRoad()==false&&board.getPlayerPlay().getBuildCity()==false&&board.getPlayerPlay().getBuildVillage()==false){
             // Loop through each hexagon and its vertices
             for (int hexIndex = 0; hexIndex < board.getHexagons().size(); hexIndex++) {
@@ -522,12 +523,13 @@ public class Ui extends JPanel{
                         }
                     }
                 }
-                board.getPlayerPlay().setBuildCity(true);
+                if(board.getPlayerPlay().getVillages().size()!=0) board.getPlayerPlay().setBuildCity(true);
                 repaint();
             }
         }
     }
     private void addCity(Point point){
+        System.out.println("add city was clicked");
         for(int i=0; i<hexMiddlePoints.length; i++){
             for(int k=0; k<fPoints.length; k++){
                 if(hexMiddlePoints[i].x+fPoints[k].x-10<=point.x&&hexMiddlePoints[i].x+fPoints[k].x+10>=point.x&&hexMiddlePoints[i].y+fPoints[k].y-10<=point.y&&hexMiddlePoints[i].y+fPoints[k].y+10>=point.y)
@@ -1069,7 +1071,10 @@ private Resource ResourceSelect() {
                         if(!board.getPlayerPlay().resources.contains(new Resource("brick"))){colorResourceAsRed(resourceCircles.get(3));}
                         if(!board.getPlayerPlay().resources.contains(new Resource("lumber"))){colorResourceAsRed(resourceCircles.get(4));}
                         if(!board.getPlayerPlay().resources.contains(new Resource("wool"))){colorResourceAsRed(resourceCircles.get(1));}
-                        else{
+                        else if(board.getPlayerPlay().resources.contains(new Resource("grain"))&&
+                                board.getPlayerPlay().resources.contains(new Resource("brick"))&&
+                                board.getPlayerPlay().resources.contains(new Resource("lumber"))&&
+                                board.getPlayerPlay().resources.contains(new Resource("wool"))){
                             System.out.println("build village");
                             buildVillage();
                         }

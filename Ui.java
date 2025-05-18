@@ -84,6 +84,8 @@ public class Ui extends JPanel{
         if(board.getHexagons()!=null){
             this.board=board;
             setupUI();
+            startGame();
+            System.out.println("the ui was created");
         }
         else{
             System.out.println("the ui was not created becasue");
@@ -92,6 +94,40 @@ public class Ui extends JPanel{
     public void setOwnIp(String ip){
         this.ownIp=ip;
     }
+    private void startGame(){
+        List<Integer> diceRolls = new ArrayList<>();
+        for (int i = 0; i < board.getPlayers().size(); i++) {
+            diceRolls.add(RandomDice());
+        }
+
+        System.out.println("Initial rolls: " + diceRolls);
+
+        // Step 2: Find max value
+        int max = Collections.max(diceRolls);
+        List<Integer> maxIndexes = new ArrayList<>();
+        for (int i = 0; i < diceRolls.size(); i++) {
+            if (diceRolls.get(i) == max) {
+                maxIndexes.add(i);
+            }
+        }
+        int winnerIndex;
+        if (maxIndexes.size() == 1) {
+            winnerIndex = maxIndexes.get(0);
+        } else {
+            int highestReroll = -1;
+            winnerIndex = -1;
+            for (int i : maxIndexes) {
+                int reroll = RandomDice();
+                System.out.println("Re-roll for index " + i + ": " + reroll);
+                if (reroll > highestReroll) {
+                    highestReroll = reroll;
+                    winnerIndex = i;
+                }
+            }
+        }
+        System.out.println("Winner is at index: " + winnerIndex);
+    }
+        
     public void setHasHost(boolean host){
         this.HasHost=host;
         if(host) sendState();

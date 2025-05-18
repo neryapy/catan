@@ -6,7 +6,7 @@ public class Main {
     public static void main(String[] args) {
         
         
-        String[] j = {"25.37.70.3"};
+        String[] j = {"25.37.70.3","25.40.223.20"};
         new host(j, 555);
         //new Client(555, "25.40.223.20","25.37.70.3");
         //new PartyManager();

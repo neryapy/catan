@@ -21,12 +21,10 @@ This passion project is:
 ---
 
 ## 🚀 How to Run
-
+0. 
 1. **Download** the latest compiled version from the `release` folder.  
 2. **Launch** the game using the Party Manager (to host or join a match).  
 3. **Play and enjoy** with your friends over LAN or the internet!  
-
-> ✅ No Java setup required if you're using the compiled release – just click and play!
 
 ---
 

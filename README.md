@@ -49,7 +49,7 @@ To play with people *outside* your local network, you can:
 
 ## ❤️ About
 
-This is a **fun, passion-driven project** developed by me — just for the love of games, networking, and user interface design.
+This is a **fun, passion-driven project** developed by me — just for the love of games, networking, and for my java learning.
 
 You're welcome to:
 - Contribute

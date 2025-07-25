@@ -1,52 +1,66 @@
-🧱 Catan LAN - Open Source Edition
+# 🧱 Catan LAN - Open Source Edition
 
-Catan LAN is a multiplayer, open-source clone of the popular board game Catan, designed for local network play with a clean and friendly GUI. Developed as a passion project, it's lightweight, cross-platform, and fun to play with friends!
-🎮 Features
+**Catan LAN** is a multiplayer, open-source clone of the classic board game **Catan**, designed for local network play with a clean and user-friendly GUI.
 
-    🎲 Open-source version of Catan
+This passion project is:
+- Lightweight
+- Cross-platform (Java)
+- Super fun to play with friends!
 
-    🖥️ Friendly and intuitive GUI
+---
 
-    🌐 LAN-based multiplayer using a built-in Party Manager
+## 🎮 Features
 
-    🚀 No setup required — just launch and play!
+- 🎲 **Open-source** version of Catan  
+- 🖥️ **Friendly and intuitive GUI**  
+- 🌐 **LAN multiplayer** using built-in Party Manager  
+- 🚀 **Zero setup** – just launch and play  
+- 🌍 **Online play** via VPN tools like Hamachi or ZeroTier  
+- 🌐 **Port forwarding** support for global access  
+- ☕ **Java-based** – runs on all OS and CPU types  
 
-    🌍 Play online via VPN tools like Hamachi or ZeroTier
+---
 
-    🌐 Optional port forwarding for global access
+## 🚀 How to Run
 
-    ☕ Built in Java — runs on any OS and CPU architecture
+1. **Download** the latest compiled version from the `release/` folder.  
+2. **Launch** the game using the Party Manager (to host or join a match).  
+3. **Play and enjoy** with your friends over LAN or the internet!  
 
-🚀 How to Run
+> ✅ No Java setup required if you're using the compiled release – just click and play!
 
-    Download the latest compiled version from the release/ folder.
+---
 
-    Run the game using the Party Manager to host or join a match.
+## 🌐 Play Outside LAN
 
-    Play and enjoy with your friends over LAN or internet (with VPN/port-forwarding)!
+To play with people *outside* your local network, you can:
 
-    No installation or Java setup needed if using the release version — just click and play.
+- Use a VPN like:
+  - **Hamachi**
+  - **ZeroTier**
 
-🌐 Play Outside LAN
+- Or:
+  - **Port forward** the Party Manager port on your router for direct access.
 
-If you want to play with people outside your local network:
+---
 
-    Use VPN-based tools like:
+## 🖼️ Screenshot
 
-        Hamachi
+![Catan LAN Screenshot](https://github.com/user-attachments/assets/e2d7ec82-a27d-4e1e-a8df-dd54d0e67d33)
 
-        ZeroTier
+---
 
-    Or, port forward the Party Manager port on your router.
+## ❤️ About
 
-🖼️ Screenshot
-<img width="986" height="593" alt="Screenshot 2025-07-25 022927" src="https://github.com/user-attachments/assets/e2d7ec82-a27d-4e1e-a8df-dd54d0e67d33" />
+This is a **fun, passion-driven project** developed by me — just for the love of games, networking, and user interface design.
 
-❤️ About
+You're welcome to:
+- Contribute
+- Fork
+- Or simply enjoy playing!
 
-This is a fun, passion-driven project developed by me — just for the love of games, networking, and GUI development.
+---
 
-Feel free to contribute, fork, or just enjoy playing!
-📄 License
+## 📄 License
 
-MIT License – you are free to use, modify, and share.
+**MIT License** — Free to use, modify, and share.

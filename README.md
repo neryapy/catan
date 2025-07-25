@@ -21,8 +21,8 @@ This passion project is:
 ---
 
 ## 🚀 How to Run
-0. 
-1. **Download** the latest compiled version from the `release` folder.  
+0. **install** jdk if not already installed.
+1. **Download** the latest compiled version(catan.jar) from the `release` section.  
 2. **Launch** the game using the Party Manager (to host or join a match).  
 3. **Play and enjoy** with your friends over LAN or the internet!  
 

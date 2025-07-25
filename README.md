@@ -14,7 +14,6 @@ This passion project is:
 - 🎲 **Open-source** version of Catan  
 - 🖥️ **Friendly and intuitive GUI**  
 - 🌐 **LAN multiplayer** using built-in Party Manager  
-- 🚀 **Zero setup** – just launch and play  
 - 🌍 **Online play** via VPN tools like Hamachi or ZeroTier  
 - 🌐 **Port forwarding** support for global access  
 - ☕ **Java-based** – runs on all OS and CPU types  
@@ -23,7 +22,7 @@ This passion project is:
 
 ## 🚀 How to Run
 
-1. **Download** the latest compiled version from the `release/` folder.  
+1. **Download** the latest compiled version from the `release` folder.  
 2. **Launch** the game using the Party Manager (to host or join a match).  
 3. **Play and enjoy** with your friends over LAN or the internet!  
 
